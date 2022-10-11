@@ -1,0 +1,79 @@
+﻿@page "/posts"
+@using Hiyakasudere.Data.ExternalAPI.Yandere
+@inject YanderePostService YandereService
+
+<h1 class="mb-3">Posts</h1>
+
+<div class="carousel slide carousel-dark text-center"
+     data-mdb-ride="carousel">
+    <div class="carousel-inner py-4">
+        <div class="carousel-item active">
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    @if (yanderePosts == null)
+                    {
+                        <p><em>Loading...</em></p>
+                    }
+                    else
+                    {
+
+                        @foreach (var post in yanderePosts)
+                        {
+                            <div class="col-sm-2 align-self-center">
+                                <div class="card">
+                                    <img src="@post.PreviewUrl" class="card-img-top rounded" />
+                                </div>
+                            </div>
+                        }
+                    }
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="d-flex justify-content-center flex-nowrap">
+    <div class="text-white mx-2 p-2">
+        <nav>
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" @onclick="PrevPage">Previous</a></li>
+                <li class="page-item"><a class="page-link">@currentPage</a></li>
+                <li class="page-item"><a class="page-link" @onclick="NextPage">Next</a></li>
+            </ul>
+        </nav>
+    </div>
+ </div>
+
+@code {
+    private IEnumerable<YanderePost> yanderePosts;
+    
+
+    private int postCount;
+    private int postPerPage = 20;
+    private int currentPage = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await DisplayPage();
+    }
+
+
+    protected async Task DisplayPage()
+    {
+        yanderePosts = await YandereService.GetYandereData(YandereService.GenerateRequestURL(postPerPage, currentPage));
+        postCount = await YandereService.GetYanderePostCount();
+    }
+
+    protected async Task NextPage()
+    {
+        currentPage++;
+        await DisplayPage();
+    }
+
+    protected async Task PrevPage()
+    {
+        currentPage--;
+        await DisplayPage();
+    }
+}
