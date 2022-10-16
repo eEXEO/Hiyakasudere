@@ -8,7 +8,9 @@ namespace Hiyakasudere.Data.Internal.Config
 {
     public interface IAppConfigService
     {
-        int postsPerPage { get; }
-        bool isNSFW { get; }
+        int SelectedSource { get; set; }
+        int PostsPerPage { get; set; }
+        bool IsNSFW { get; set; }
+        bool UpdateConfig(int SelectedSource, int PostsPerPage, bool IsNSFW);
     }
 }

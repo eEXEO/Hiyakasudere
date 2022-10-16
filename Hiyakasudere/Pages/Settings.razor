@@ -1,26 +1,52 @@
 ﻿@page "/settings"
 @using Hiyakasudere.Data.Internal.Config
-
+@inject IAppConfigService _appConfigService;
 <h1>Settings</h1>
 
-<form>
-    <div class="row">
-        <div class="col">
-            <input class="form-check-input" type="checkbox" value="ABCDE" id="nsfwCheckbox" checked>
-            <label class="form-check-label" for="nsfwCheckbox">NSFW content</label>
-        </div>
-    </div>
-    <div class="row">
-        
-    </div>
-</form>
-
-@code {
-
-    private int currentCount = 0;
-
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
+@if(configDataModel != null)
+{
+    <EditForm Model="@configDataModel" OnValidSubmit="@HandleValidSubmit">
+        <p>
+            <label>
+                NSFW Enabler:
+                <InputCheckbox @bind-Value="configDataModel.NSFWEnabled"></InputCheckbox>
+            </label>
+        </p>
+        <p>
+            <label>
+                Source select:
+                <InputSelect @bind-Value="configDataModel.SelectedSource">
+                    <option value="1">Yandere</option>
+                    <option value="2">Safebooru</option>
+                </InputSelect>
+            </label>
+        </p>
+        <p>
+            <label>
+                Source select:
+                <InputSelect @bind-Value="configDataModel.PostsPerPage">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </InputSelect>
+            </label>
+        </p>
+        <p>
+            <button type="submit" class="btn btn-primary">Save settings</button>
+        </p>
+    </EditForm>
 }
+
+
+    @code {
+    
+        private ConfigDataModel configDataModel = new ConfigDataModel(1, 25, true);
+
+
+        private void HandleValidSubmit()
+        {
+            System.Diagnostics.Debug.WriteLine("HandleValidSubmit called");
+            _appConfigService.UpdateConfig(configDataModel.SelectedSource, configDataModel.PostsPerPage, configDataModel.NSFWEnabled);
+        }
+    }

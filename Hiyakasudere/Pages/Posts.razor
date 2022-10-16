@@ -1,6 +1,6 @@
 ﻿@page "/posts"
-@using Hiyakasudere.Data.ExternalAPI.Yandere
-@inject YanderePostService YandereService
+@using Hiyakasudere.Data.Internal.Data.Post
+@inject IPostTranslationService PostService
 
 <h1 class="mb-3">Posts</h1>
 
@@ -11,14 +11,14 @@
             <div class="container">
                 <div class="row justify-content-center">
 
-                    @if (yanderePosts == null)
+                    @if (booruPosts == null)
                     {
                         <p><em>Loading...</em></p>
                     }
                     else
                     {
 
-                        @foreach (var post in yanderePosts)
+                        @foreach (var post in booruPosts)
                         {
                             <div class="col-sm-2 align-self-center">
                                 <div class="card">
@@ -46,8 +46,8 @@
  </div>
 
 @code {
-    private IEnumerable<YanderePost> yanderePosts;
-    
+    private IEnumerable<PostInternal> booruPosts;
+
 
     private int postCount;
     private int postPerPage = 20;
@@ -61,8 +61,7 @@
 
     protected async Task DisplayPage()
     {
-        yanderePosts = await YandereService.GetYandereData(YandereService.GenerateRequestURL(postPerPage, currentPage));
-        postCount = await YandereService.GetYanderePostCount();
+        booruPosts = await PostService.GetPostData(currentPage);
     }
 
     protected async Task NextPage()

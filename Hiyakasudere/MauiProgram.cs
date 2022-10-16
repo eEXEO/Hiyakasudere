@@ -3,6 +3,8 @@ using Hiyakasudere.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Hiyakasudere.Data.ExternalAPI.Yandere;
 using Hiyakasudere.Data.Internal.Config;
+using Hiyakasudere.Data.ExternalAPI.Safebooru;
+using Hiyakasudere.Data.Internal.Data.Post;
 
 namespace Hiyakasudere;
 
@@ -22,8 +24,11 @@ public static class MauiProgram
 		#if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
-		builder.Services.AddSingleton<YanderePostService>();
-		builder.Services.AddScoped<IAppConfigService, AppConfigService>();
+		builder.Services.AddSingleton<IYanderePostService, YanderePostService>();
+        builder.Services.AddSingleton<ISafebooruPostService, SafebooruPostService>();
+		builder.Services.AddSingleton<IPostTranslationService, PostTranslationService>();
+        builder.Services.AddSingleton<IAppConfigService, AppConfigService>();
+		
 
         return builder.Build();
 	}

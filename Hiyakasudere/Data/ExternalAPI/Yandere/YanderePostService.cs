@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace Hiyakasudere.Data.ExternalAPI.Yandere;
 
-public class YanderePostService
+public class YanderePostService : IYanderePostService
 {
     HttpClient client;
     XDocument xDocument;
@@ -30,7 +30,7 @@ public class YanderePostService
             {
                 var content = await response.Content.ReadAsStringAsync();
                 yanderePosts = JsonConvert.DeserializeObject<IEnumerable<YanderePost>>(content);
-                System.Diagnostics.Debug.WriteLine("Incoming Size: " + yanderePosts.Count());
+                //System.Diagnostics.Debug.WriteLine("Incoming Size: " + yanderePosts.Count());
             }
 
         }
@@ -48,7 +48,7 @@ public class YanderePostService
         requestUri += $"?limit={postsPerPage}";
         requestUri += $"&page={currentPage}";
         requestUri += "&tags=";
-        System.Diagnostics.Debug.WriteLine(_appConfigService.isNSFW);
+        //System.Diagnostics.Debug.WriteLine(_appConfigService.isNSFW);
 
         return requestUri;
     }
