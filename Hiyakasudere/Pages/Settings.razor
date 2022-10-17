@@ -1,6 +1,6 @@
 ﻿@page "/settings"
 @using Hiyakasudere.Data.Internal.Config
-@inject IAppConfigService _appConfigService;
+@inject IAppConfigService appConfig;
 <h1>Settings</h1>
 
 @if(configDataModel != null)
@@ -23,12 +23,12 @@
         </p>
         <p>
             <label>
-                Source select:
+                Displayed posts:
                 <InputSelect @bind-Value="configDataModel.PostsPerPage">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
+                    <option value="12">12</option>
+                    <option value="18">18</option>
+                    <option value="24">24</option>
+                    <option value="48">48</option>
                 </InputSelect>
             </label>
         </p>
@@ -40,13 +40,17 @@
 
 
     @code {
-    
-        private ConfigDataModel configDataModel = new ConfigDataModel(1, 25, true);
+        
+        private ConfigDataModel configDataModel;
 
+        protected override void OnInitialized()
+        {
+            configDataModel = appConfig.GetCurrentConfiguration();
+        }
 
         private void HandleValidSubmit()
         {
             System.Diagnostics.Debug.WriteLine("HandleValidSubmit called");
-            _appConfigService.UpdateConfig(configDataModel.SelectedSource, configDataModel.PostsPerPage, configDataModel.NSFWEnabled);
+            appConfig.UpdateConfig(configDataModel.SelectedSource, configDataModel.PostsPerPage, configDataModel.NSFWEnabled);
         }
     }
