@@ -39,11 +39,12 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                     foreach (YanderePost element in yanderePosts)
                     {
                         temp.Add(new PostInternal(element.Id, element.Tags, element.CreatedAt.ToString(), element.Author, element.Source, element.Score, element.PreviewUrl, element.PreviewWidth,
-                            element.PreviewHeight, element.FileUrl, element.Width, element.Height, element.FileSize, element.Rating, element.HasChildren));
+                            element.PreviewHeight, element.JpegUrl, element.Width, element.Height, element.FileSize, element.Rating, element.HasChildren));
                     }
 
                     posts = temp.AsEnumerable<PostInternal>();
                     break;
+
                 case 2://This is visible pain
                     safebooruPosts = await _safebooruPostService.GetSafebooruData(_safebooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage));
                    
@@ -58,7 +59,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 
                     foreach (SafebooruPost element in safebooruPosts)
                     {
-                        //Source in API inconsistent
+                        //API is inconsistent FFS
                         source = null;
                         try
                         {

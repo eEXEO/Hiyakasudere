@@ -1,6 +1,9 @@
 ﻿@page "/settings"
 @using Hiyakasudere.Data.Internal.Config
-@inject IAppConfigService appConfig;
+@using Hiyakasudere.Data.Internal.MultiplatformInterfaces
+@inject IAppConfigService _appConfig;
+@inject IDirectoryPicker _dirPick;
+
 <h1>Settings</h1>
 
 @if(configDataModel != null)
@@ -36,21 +39,28 @@
             <button type="submit" class="btn btn-primary">Save settings</button>
         </p>
     </EditForm>
+
+    <input class="btn btn-primary" value="Select Directory" @onclick="SelectDirectory">
 }
 
 
-    @code {
-        
-        private ConfigDataModel configDataModel;
+@code {
 
-        protected override void OnInitialized()
-        {
-            configDataModel = appConfig.GetCurrentConfiguration();
-        }
+    private ConfigDataModel configDataModel;
 
-        private void HandleValidSubmit()
-        {
-            System.Diagnostics.Debug.WriteLine("HandleValidSubmit called");
-            appConfig.UpdateConfig(configDataModel.SelectedSource, configDataModel.PostsPerPage, configDataModel.NSFWEnabled);
-        }
+    protected override void OnInitialized()
+    {
+        configDataModel = _appConfig.GetCurrentConfiguration();
     }
+
+    private void HandleValidSubmit()
+    {
+        System.Diagnostics.Debug.WriteLine("HandleValidSubmit called");
+        _appConfig.UpdateConfig(configDataModel.SelectedSource, configDataModel.PostsPerPage, configDataModel.NSFWEnabled);
+    }
+
+    private async Task SelectDirectory()
+    {
+        await _appConfig.UpdateImagePath();
+    }
+}

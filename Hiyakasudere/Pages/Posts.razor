@@ -1,5 +1,6 @@
 ﻿@page "/posts"
 @using Hiyakasudere.Data.Internal.Data.Post
+@using Hiyakasudere.Pages.Modals
 @inject IPostTranslationService PostService
 
 <h1 class="mb-3">Posts</h1>
@@ -18,11 +19,11 @@
                     else
                     {
 
-                        @foreach (var post in booruPosts)
+                        @foreach (var post in booruPosts.Select((elem, index) => ( elem, index )))
                         {
                             <div class="col-sm-2 align-self-center">
-                                <div class="card">
-                                    <img src="@post.PreviewUrl" class="card-img-top rounded" />
+                                <div class="card" @onclick="() => ShowModal(post.index)">
+                                    <img src="@post.elem.PreviewUrl" class="card-img-top rounded" />
                                 </div>
                             </div>
                         }
@@ -45,7 +46,10 @@
     </div>
  </div>
 
+
 @code {
+    [CascadingParameter] IModalService Modal { get; set; } = default!;
+
     private IEnumerable<PostInternal> booruPosts;
 
     private int currentPage = 1;
@@ -71,5 +75,19 @@
     {
         currentPage--;
         await DisplayPage();
+    }
+
+    private void ShowModal(int postId)
+    {
+        var options = new ModalOptions()
+            {
+                HideCloseButton = true,
+                HideHeader = true,
+                Position = ModalPosition.Middle
+            };
+
+        var parameters = new ModalParameters().Add("PostData", booruPosts.ElementAt(postId));
+
+        var modal = Modal.Show<ModalPostFull>("", parameters, options);
     }
 }

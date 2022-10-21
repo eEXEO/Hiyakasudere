@@ -4,11 +4,12 @@ namespace Hiyakasudere.Data.Internal.Config
 {
     public class ConfigDataModel
     {
-        public ConfigDataModel(int selectedSource, int postsPerPage, bool nSFWEnabled)
+        public ConfigDataModel(int selectedSource, int postsPerPage, bool nSFWEnabled, string imageSavePath)
         {
             SelectedSource = selectedSource;
             PostsPerPage = postsPerPage;
             NSFWEnabled = nSFWEnabled;
+            ImageSavePath = imageSavePath;
         }
 
         [Required]
@@ -23,6 +24,9 @@ namespace Hiyakasudere.Data.Internal.Config
 
         [Required]
         public bool NSFWEnabled { get; set; }
+
+        [Required]
+        public string ImageSavePath { get; set; }
 
     }
 }
