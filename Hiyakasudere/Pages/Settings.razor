@@ -2,7 +2,7 @@
 @using Hiyakasudere.Data.Internal.Config
 @using Hiyakasudere.Data.Internal.MultiplatformInterfaces
 @inject IAppConfigService _appConfig;
-@inject IDirectoryPicker _dirPick;
+@inject IFileManager _fileManager;
 
 <h1>Settings</h1>
 
@@ -55,12 +55,11 @@
 
     private void HandleValidSubmit()
     {
-        System.Diagnostics.Debug.WriteLine("HandleValidSubmit called");
         _appConfig.UpdateConfig(configDataModel.SelectedSource, configDataModel.PostsPerPage, configDataModel.NSFWEnabled);
     }
 
-    private async Task SelectDirectory()
+    private void SelectDirectory()
     {
-        await _appConfig.UpdateImagePath();
+        //await _appConfig.UpdateImagePath();
     }
 }

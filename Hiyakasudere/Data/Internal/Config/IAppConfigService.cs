@@ -15,7 +15,5 @@ namespace Hiyakasudere.Data.Internal.Config
         string ImageSavePath { get; set; }
         bool UpdateConfig(int SelectedSource, int PostsPerPage, bool IsNSFW, string ImageSavePath);
         bool UpdateConfig(int SelectedSource, int PostsPerPage, bool IsNSFW);
-        string PassFallbackSaveDir();
-        Task<bool> UpdateImagePath();
     }
 }

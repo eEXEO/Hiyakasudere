@@ -1,10 +1,7 @@
 ﻿@page "/modals/postfull"
 @inject IJSRuntime JS
-@inject IAppConfigService config
 
 @using Hiyakasudere.Data.Internal.Data.Post
-@using Hiyakasudere.Data.Internal.Functionality.Download
-@using Hiyakasudere.Data.Internal.Config
 
 @if (booruPost == null)
 {
@@ -15,32 +12,23 @@ else
     <img src="@booruPost.OriginalUrl.AbsoluteUri" class="card-img-top rounded img-fluid" id="fullImageImg">
 
     <input class="btn btn-primary" value="Save Image" @onclick="SaveImage">
-
-    @imgData
 }
 
 @code {
     private PostInternal booruPost = null;
     private IJSObjectReference module;
-    private FileDownloader fd;
-
-    private string imgData = "";
 
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     [Parameter] public PostInternal PostData { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        fd = new FileDownloader(config);
         booruPost = PostData;
         module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/Modals/ModalPostFull.razor.js");        
     }
 
-    protected async void SaveImage()
+    protected void SaveImage()
     {
-        //await module.InvokeAsync<string>("ReLoadImages");
-        await fd.DownloadFromUrl(booruPost.OriginalUrl.AbsoluteUri);
-        
         System.Diagnostics.Debug.WriteLine(booruPost.OriginalUrl.AbsoluteUri.ToString());
     }
 }

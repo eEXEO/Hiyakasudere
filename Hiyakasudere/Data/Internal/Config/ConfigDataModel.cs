@@ -4,6 +4,13 @@ namespace Hiyakasudere.Data.Internal.Config
 {
     public class ConfigDataModel
     {
+        public ConfigDataModel()
+        {
+            SelectedSource = 1;
+            PostsPerPage = 12;
+            NSFWEnabled = false;
+            ImageSavePath = "";
+        }
         public ConfigDataModel(int selectedSource, int postsPerPage, bool nSFWEnabled, string imageSavePath)
         {
             SelectedSource = selectedSource;

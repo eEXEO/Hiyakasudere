@@ -10,74 +10,52 @@ namespace Hiyakasudere.Data.Internal.Config
 {
     public class AppConfigService : IAppConfigService
     {
-        IDirectoryPicker directoryPicker;
+        #region VARIABLES
+
+        readonly IFileManager fileManager;
 
         public int SelectedSource { get; set; } = 1;
         public int PostsPerPage { get; set; } = 18;
         public bool IsNSFW { get; set; } = false;
         public string ImageSavePath { get; set; } = "";
 
-        public AppConfigService(IDirectoryPicker dirPick)
+        #endregion
+
+        public AppConfigService(IFileManager fileManager)
         {
-            directoryPicker = dirPick;
+            this.fileManager = fileManager;
             
             SelectedSource = 2;
             PostsPerPage = 18;
             IsNSFW = true;
-            ImageSavePath = directoryPicker.GetPlatformDefaultImageDir();
+            ImageSavePath = "";
 
-            SerializeAppConfig();
+            SerializeAppConfig().WaitAsync(CancellationToken.None);
         }
 
-        public string PassFallbackSaveDir()
+        protected async Task SerializeAppConfig()
         {
-            return directoryPicker.GetFallbackDirectory();
-        }
-
-        protected void SerializeAppConfig()
-        {
-            string filename = "appConfig.json";
-            string filepath = AppContext.BaseDirectory + filename;
-
-            System.Diagnostics.Debug.WriteLine(filepath);
-
-            if (File.Exists(filepath))
+            try
             {
-                try
+                if (await fileManager.IsConfigFilePresent())
                 {
-                    ConfigDataModel fromFile = JsonConvert.DeserializeObject<ConfigDataModel>(File.ReadAllText(filepath));
-
+                    var fromFile = await fileManager.ReadConfigFile();
                     UpdateConfig(fromFile.SelectedSource, fromFile.PostsPerPage, fromFile.NSFWEnabled, fromFile.ImageSavePath);
-
                 }
-                catch (Exception e)
+                else
                 {
-                    File.WriteAllText(filepath, JsonConvert.SerializeObject(GetCurrentConfiguration()));
-                    System.Diagnostics.Debug.WriteLine(e);
+                    System.Diagnostics.Debug.WriteLine("FILE NOT EXISTS!");
+                    await fileManager.ForceSaveConfigFile(GetCurrentConfiguration());
                 }
-
-            }
-            else
+            }catch(Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("FILE NOT EXISTS!");
-                File.WriteAllText(filepath, JsonConvert.SerializeObject(GetCurrentConfiguration()));
+                System.Diagnostics.Debug.WriteLine(e);
             }
         }
 
         protected void UpdateAppConfigFile()
         {
-            string filename = "appConfig.json";
-            string filepath = AppContext.BaseDirectory + filename;
-
-            try
-            {
-                File.WriteAllText(filepath, JsonConvert.SerializeObject(GetCurrentConfiguration()));
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(e);
-            }
-                
+            fileManager.ForceSaveConfigFile(GetCurrentConfiguration()).WaitAsync(CancellationToken.None);
         }
 
         public ConfigDataModel GetCurrentConfiguration()
@@ -107,14 +85,6 @@ namespace Hiyakasudere.Data.Internal.Config
 
             System.Diagnostics.Debug.WriteLine("AppConfigService: " + SelectedSource + ", " + PostsPerPage + ", ", IsNSFW);
 
-            UpdateAppConfigFile();
-
-            return true;
-        }
-
-        public async Task<bool> UpdateImagePath()
-        {
-            ImageSavePath = await directoryPicker.PickDirectory();
             UpdateAppConfigFile();
 
             return true;

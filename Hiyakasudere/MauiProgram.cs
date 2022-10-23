@@ -27,7 +27,7 @@ public static class MauiProgram
 				builder.Services.AddBlazorWebViewDeveloperTools();
 		#endif
 		#if WINDOWS
-				builder.Services.AddTransient<IDirectoryPicker, Hiyakasudere.Platforms.Windows.Functionality.DirectoryPicker>();
+				builder.Services.AddTransient<IFileManager, Hiyakasudere.Platforms.Windows.Functionality.FileManager>();
 		#endif
 
         builder.Services.AddBlazoredModal();
