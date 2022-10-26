@@ -1,7 +1,9 @@
 ﻿@page "/posts"
 @using Hiyakasudere.Data.Internal.Data.Post
+@using Hiyakasudere.Data.Internal.MultiplatformInterfaces
 @using Hiyakasudere.Pages.Modals
 @inject IPostTranslationService PostService
+@inject IFileManager FileManager
 
 <h1 class="mb-3">Posts</h1>
 
@@ -83,11 +85,14 @@
             {
                 HideCloseButton = true,
                 HideHeader = true,
-                Position = ModalPosition.Middle
+                Position = ModalPosition.Middle,
+                Size = ModalSize.Medium
             };
 
         var parameters = new ModalParameters().Add("PostData", booruPosts.ElementAt(postId));
 
         var modal = Modal.Show<ModalPostFull>("", parameters, options);
+
+        //DOWNLOAD IMAGE IF MODAL RET TRUE
     }
 }

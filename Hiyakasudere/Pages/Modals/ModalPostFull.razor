@@ -9,9 +9,14 @@
 }
 else
 {
-    <img src="@booruPost.OriginalUrl.AbsoluteUri" class="card-img-top rounded img-fluid" id="fullImageImg">
+    <img src="@booruPost.SampleUrl.AbsoluteUri" class="card-img-top rounded img-fluid" id="fullImageImg">
 
-    <input class="btn btn-primary" value="Save Image" @onclick="SaveImage">
+    <img src="clear.gif">
+
+    <div class="d-flex justify-content-center flex-nowrap" style="padding: 5px">
+        <input class="btn btn-primary" value="Save Image" @onclick="SaveImage">
+    </div>
+    
 }
 
 @code {
@@ -29,6 +34,7 @@ else
 
     protected void SaveImage()
     {
-        System.Diagnostics.Debug.WriteLine(booruPost.OriginalUrl.AbsoluteUri.ToString());
+        System.Diagnostics.Debug.WriteLine(booruPost.SampleUrl.AbsoluteUri.ToString());
+
     }
 }

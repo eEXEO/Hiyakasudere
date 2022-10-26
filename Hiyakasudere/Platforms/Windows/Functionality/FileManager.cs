@@ -80,6 +80,7 @@ namespace Hiyakasudere.Platforms.Windows.Functionality
             byte[] data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(filedata));
 
             await stream.WriteAsync(data.AsBuffer());
+            stream.Dispose();
         }
 
         /// <summary>Function <c>ReadConfigFile</c> returns serialized config class, 
