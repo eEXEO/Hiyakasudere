@@ -2,6 +2,7 @@
 using Hiyakasudere.Data.ExternalAPI;
 using Hiyakasudere.Data.ExternalAPI.Yandere;
 using Hiyakasudere.Data.ExternalAPI.Safebooru;
+using System.Threading.Tasks;
 
 namespace Hiyakasudere.Data.Internal.Data.Post
 {
@@ -28,6 +29,19 @@ namespace Hiyakasudere.Data.Internal.Data.Post
             IEnumerable<SafebooruPost> safebooruPosts = null;
 
             List<PostInternal> temp = new();
+
+            if(_appConfigService.IsLoaded is false)
+            {
+                await Task.Run(() =>
+                {
+                    while (_appConfigService.IsLoaded is false)
+                    {
+                        Task.Delay(25);
+                    }
+
+                    return;
+                });
+            }
 
             System.Diagnostics.Debug.WriteLine("PostTranslationService: " + _appConfigService.SelectedSource + ", " + _appConfigService.PostsPerPage + ", ", _appConfigService.IsNSFW);
 

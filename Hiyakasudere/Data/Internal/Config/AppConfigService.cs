@@ -14,6 +14,8 @@ namespace Hiyakasudere.Data.Internal.Config
 
         readonly IFileManager fileManager;
 
+        public bool IsLoaded { get; set; } = false;
+
         public int SelectedSource { get; set; } = 1;
         public int PostsPerPage { get; set; } = 18;
         public bool IsNSFW { get; set; } = false;
@@ -50,6 +52,9 @@ namespace Hiyakasudere.Data.Internal.Config
             }catch(Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e);
+            }finally
+            {
+                IsLoaded = true;
             }
         }
 

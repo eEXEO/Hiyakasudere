@@ -7,6 +7,7 @@ using Hiyakasudere.Data.ExternalAPI.Safebooru;
 using Hiyakasudere.Data.Internal.Data.Post;
 using Blazored.Modal;
 using Hiyakasudere.Data.Internal.MultiplatformInterfaces;
+using Hiyakasudere.Data.Internal.Functionality.ImageUtils;
 
 namespace Hiyakasudere;
 
@@ -36,7 +37,10 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISafebooruPostService, SafebooruPostService>();
 		builder.Services.AddSingleton<IPostTranslationService, PostTranslationService>();
         builder.Services.AddSingleton<IAppConfigService, AppConfigService>();
-		
+        builder.Services.AddSingleton<IImageNetUtils, ImageNetUtils>();
+        
+
+
 
         return builder.Build();
 	}

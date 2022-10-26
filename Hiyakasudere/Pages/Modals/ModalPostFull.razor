@@ -1,17 +1,18 @@
 ﻿@page "/modals/postfull"
-@inject IJSRuntime JS
-
+@using Microsoft.JSInterop
 @using Hiyakasudere.Data.Internal.Data.Post
+@using Hiyakasudere.Data.Internal.Functionality.ImageUtils
 
-@if (booruPost == null)
+@inject IJSRuntime JS
+@inject IImageNetUtils ImgNetUtils
+
+@if (imgData == null)
 {
      <p><em>Loading...</em></p>
 }
 else
 {
-    <img src="@booruPost.SampleUrl.AbsoluteUri" class="card-img-top rounded img-fluid" id="fullImageImg">
-
-    <img src="clear.gif">
+    <img @ref="imageField" src="@imgData" class="card-img-top rounded img-fluid" id="fullImageImg">
 
     <div class="d-flex justify-content-center flex-nowrap" style="padding: 5px">
         <input class="btn btn-primary" value="Save Image" @onclick="SaveImage">
@@ -22,6 +23,9 @@ else
 @code {
     private PostInternal booruPost = null;
     private IJSObjectReference module;
+    private string imgData = null;
+
+    private ElementReference imageField;
 
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     [Parameter] public PostInternal PostData { get; set; }
@@ -29,12 +33,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         booruPost = PostData;
-        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/Modals/ModalPostFull.razor.js");        
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/Modals/ModalPostFull.razor.js");
+
+        var baseImg = await ImgNetUtils.GetImageAsBase64(booruPost.SampleUrl.AbsoluteUri.ToString());
+        imgData = "data:image/png;base64," + baseImg;
     }
 
     protected void SaveImage()
     {
         System.Diagnostics.Debug.WriteLine(booruPost.SampleUrl.AbsoluteUri.ToString());
-
     }
 }

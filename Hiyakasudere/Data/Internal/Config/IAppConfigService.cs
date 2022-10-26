@@ -9,6 +9,7 @@ namespace Hiyakasudere.Data.Internal.Config
     public interface IAppConfigService
     {
         public ConfigDataModel GetCurrentConfiguration();
+        bool IsLoaded { get; set; }
         int SelectedSource { get; set; }
         int PostsPerPage { get; set; }
         bool IsNSFW { get; set; }
