@@ -21,3 +21,11 @@ As mentioned above, it is new booru client. List of supported services is presen
 ## Installation
 
 For now you have to compile app by Yourself. Public build will come in form of windows APPX installer files.
+
+## Preview Images
+
+![Preview Image no. 1](/DemoMultimediaFiles/apppreview_1.png)
+
+![Preview Image no. 1](/DemoMultimediaFiles/apppreview_2.png)
+
+![Preview Image no. 1](/DemoMultimediaFiles/apppreview_2.png)
