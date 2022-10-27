@@ -40,7 +40,7 @@
         </p>
     </EditForm>
 
-    <input class="btn btn-primary" value="Select Directory" @onclick="SelectDirectory">
+    <input class="btn btn-primary" value="Open Images Directory" @onclick="OpenSaveDir">
 }
 
 
@@ -58,8 +58,8 @@
         _appConfig.UpdateConfig(configDataModel.SelectedSource, configDataModel.PostsPerPage, configDataModel.NSFWEnabled);
     }
 
-    private void SelectDirectory()
+    private void OpenSaveDir()
     {
-        //await _appConfig.UpdateImagePath();
+        _fileManager.OpenImagesDir();
     }
 }

@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 namespace Hiyakasudere.Data.Internal.Data.Post
 {
-
-
     public class PostTranslationService : IPostTranslationService
     {
         readonly private IAppConfigService _appConfigService;
@@ -36,7 +34,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                 {
                     while (_appConfigService.IsLoaded is false)
                     {
-                        Task.Delay(25);
+                        Task.Delay(50);
                     }
 
                     return;
@@ -52,8 +50,9 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 
                     foreach (YanderePost element in yanderePosts)
                     {
-                        //temp.Add(new PostInternal(element.Id, element.Tags, element.CreatedAt.ToString(), element.Author, element.Source, element.Score, element.PreviewUrl, element.PreviewWidth,
-                        //element.PreviewHeight, element.JpegUrl, element.Width, element.Height, element.FileSize, element.Rating, element.HasChildren, element.SampleUrl));
+                        //(first letter from - safe, questionable, explict)
+                        if (_appConfigService.IsNSFW is false && element.Rating.Equals("e") || _appConfigService.IsNSFW is false && element.Rating.Equals("q")) continue;
+
                         temp.Add(new PostInternal(element.Id, element.Tags, "", element.Author, element.Source, 
                             element.Score, element.PreviewUrl, element.PreviewWidth, element.PreviewHeight, element.SampleUrl,
                             element.SampleWidth, element.SampleHeight, element.FileUrl, element.Width, element.Height,
@@ -63,7 +62,8 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                     posts = temp.AsEnumerable<PostInternal>();
                     break;
 
-                case 2://This is visible pain
+                case 2:
+                    //This is visible pain
                     safebooruPosts = await _safebooruPostService.GetSafebooruData(_safebooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage));
                    
                     Uri source = null;
@@ -79,6 +79,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 
                     foreach (SafebooruPost element in safebooruPosts)
                     {
+                        //This source is safe for viewer, so no precautions taken
                         //API is inconsistent FFS
                         source = null;
                         try
@@ -102,10 +103,6 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                             loScore, new Uri(element.Preview_url), loPrWidth, loPrHeight, new Uri(element.Sample_url),
                             loSaWidth, loSaHeight, new Uri(element.File_url), loWidth, loHeight, null,
                             element.Rating, loHasChildren));
-
-                        //temp.Add(new PostInternal(loId, element.Tags, element.Created_at, element.Creator_id, source, loScore, 
-                        //    new System.Uri(element.Preview_url), loPrWidth, loPrHeight, new Uri(element.File_url),
-                        //    loWidth, loHeight, null, element.Rating, loHasChildren));
                     }
 
                     posts = temp.AsEnumerable<PostInternal>();

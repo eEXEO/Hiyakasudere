@@ -10,6 +10,7 @@ namespace Hiyakasudere.Data.Internal.MultiplatformInterfaces
     public interface IFileManager
     {
         Task<bool> IsConfigFilePresent();
+        Task OpenImagesDir();
         Task ForceSaveConfigFile(ConfigDataModel filedata);
         Task<ConfigDataModel> ReadConfigFile();
         Task<bool> SaveImage(string base64Image, string filename);

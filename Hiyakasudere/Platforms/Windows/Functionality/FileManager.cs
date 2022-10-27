@@ -1,32 +1,28 @@
 ﻿using Hiyakasudere.Data.Internal.MultiplatformInterfaces;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Windows.Storage;
 using Hiyakasudere.Data.Internal.Config;
 using Newtonsoft.Json;
-using Windows.Storage.Streams;
-using static System.Net.Mime.MediaTypeNames;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.IO;
-using Windows.Networking.Sockets;
-using System.Collections;
+using System.Diagnostics;
 
 namespace Hiyakasudere.Platforms.Windows.Functionality
 {
     internal class FileManager : IFileManager
     {
         #region PATHS DEFINE
+        /// <summary>Function <c>GetRoamingDirPath</c> returns app roaming path as string for hidden from user data</summary>
+        ///
         protected string GetRoamingDirPath()
         {
             return ApplicationData.Current.RoamingFolder.Path;
         }
 
+        /// <summary>Function <c>GetAppMainDir</c> returns app roaming path as StorageFolder for further use/summary>
+        ///
         protected async Task<StorageFolder> GetAppMainDir()
         {
+            System.Diagnostics.Debug.WriteLine(GetRoamingDirPath());
             StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(GetRoamingDirPath());
             return folder;
         }
@@ -48,6 +44,17 @@ namespace Hiyakasudere.Platforms.Windows.Functionality
             folder = await folder.GetFolderAsync("Hiyakasudere");
             return folder;
         }
+        #endregion
+
+        #region MISC
+        /// <summary>Function <c>OpenImagesDir</c> opens path .../Pictures/Hiyakasudere/ in explorer.exe </summary>
+        ///
+        public async Task OpenImagesDir()
+        {
+            var dir = await GetAppImagesDir();
+            Process.Start("explorer.exe", dir.Path);
+        }
+
         #endregion
 
         #region CONFIG FILE FUNCIONALITY
@@ -119,7 +126,10 @@ namespace Hiyakasudere.Platforms.Windows.Functionality
         #endregion
 
         #region IMAGE SAVE FUNCTIONALITY
-
+        /// <summary>Function <c>SaveImage</c> saves image in .../Pictures/Hiyakasudere/ directory 
+        /// <para>base64Image - string representing image</para>
+        /// <para>tags - image tags, NOT USED</para></summary>
+        ///
         public async Task<bool> SaveImage(string base64Image, string tags)
         {
             StorageFolder folder = await GetAppImagesDir();

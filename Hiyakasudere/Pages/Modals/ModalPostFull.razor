@@ -1,5 +1,6 @@
 ﻿@page "/modals/postfull"
 @using Microsoft.JSInterop
+@using Microsoft.Maui
 @using Hiyakasudere.Data.Internal.Data.Post
 @using Hiyakasudere.Data.Internal.MultiplatformInterfaces
 @using Hiyakasudere.Data.Internal.Functionality.ImageUtils
@@ -20,7 +21,7 @@
 }
 else
 {
-    <img @ref="imageField" src="@imgData" class="card-img-top rounded img-fluid" id="fullImageImg">
+    <img src="@imgData" class="card-img-top rounded img-fluid" id="fullImageImg">
 
     <div class="d-flex justify-content-center flex-nowrap" style="padding: 5px">
         <input class="btn btn-primary" value="Save Image" @onclick="SaveImage">
@@ -32,8 +33,6 @@ else
     private PostInternal booruPost = null;
     private IJSObjectReference module;
     private string imgData = null;
-
-    private ElementReference imageField;
 
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     [Parameter] public PostInternal PostData { get; set; }
@@ -50,8 +49,8 @@ else
     protected async Task SaveImage()
     {
         var imgData = await ImgNetUtils.GetImageAsBase64(booruPost.OriginalUrl.AbsoluteUri.ToString());
+
         await FileManager.SaveImage(imgData, "Hiyakasudere" + "_" + DateTime.Now.ToFileTime());
-        System.Diagnostics.Debug.WriteLine(booruPost.SampleUrl.AbsoluteUri.ToString());
 
     }
 }

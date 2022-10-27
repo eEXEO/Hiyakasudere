@@ -27,9 +27,9 @@ namespace Hiyakasudere.Data.Internal.Config
         {
             this.fileManager = fileManager;
             
-            SelectedSource = 2;
+            SelectedSource = 1;
             PostsPerPage = 18;
-            IsNSFW = true;
+            IsNSFW = false;
             ImageSavePath = "";
 
             SerializeAppConfig().WaitAsync(CancellationToken.None);
