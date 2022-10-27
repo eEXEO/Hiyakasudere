@@ -12,5 +12,7 @@ namespace Hiyakasudere.Data.Internal.MultiplatformInterfaces
         Task<bool> IsConfigFilePresent();
         Task ForceSaveConfigFile(ConfigDataModel filedata);
         Task<ConfigDataModel> ReadConfigFile();
+        Task<bool> SaveImage(string base64Image, string filename);
+
     }
 }

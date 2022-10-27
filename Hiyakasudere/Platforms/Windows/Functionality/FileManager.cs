@@ -120,7 +120,20 @@ namespace Hiyakasudere.Platforms.Windows.Functionality
 
         #region IMAGE SAVE FUNCTIONALITY
 
-        //
+        public async Task<bool> SaveImage(string base64Image, string tags)
+        {
+            StorageFolder folder = await GetAppImagesDir();
+            var file = await folder.CreateFileAsync(tags + "." + "png", CreationCollisionOption.ReplaceExisting);
+            var stream = await file.OpenAsync(FileAccessMode.ReadWrite);
+            byte[] data = Convert.FromBase64String(base64Image);
+
+            
+            await stream.WriteAsync(data.AsBuffer());
+            stream.Dispose();
+
+
+            return true;
+        }
 
         #endregion
 

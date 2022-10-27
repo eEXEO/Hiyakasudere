@@ -1,14 +1,22 @@
 ﻿@page "/modals/postfull"
 @using Microsoft.JSInterop
 @using Hiyakasudere.Data.Internal.Data.Post
+@using Hiyakasudere.Data.Internal.MultiplatformInterfaces
 @using Hiyakasudere.Data.Internal.Functionality.ImageUtils
 
 @inject IJSRuntime JS
 @inject IImageNetUtils ImgNetUtils
+@inject IFileManager FileManager
 
 @if (imgData == null)
 {
-     <p><em>Loading...</em></p>
+
+    <div class="d-flex justify-content-center flex-nowrap" style="padding: 5px">
+        <div class="align-self-center">
+            <div class="spinner-grow text-danger" role="status"></div>
+        </div>
+    </div>
+
 }
 else
 {
@@ -39,8 +47,11 @@ else
         imgData = "data:image/png;base64," + baseImg;
     }
 
-    protected void SaveImage()
+    protected async Task SaveImage()
     {
+        var imgData = await ImgNetUtils.GetImageAsBase64(booruPost.OriginalUrl.AbsoluteUri.ToString());
+        await FileManager.SaveImage(imgData, "Hiyakasudere" + "_" + DateTime.Now.ToFileTime());
         System.Diagnostics.Debug.WriteLine(booruPost.SampleUrl.AbsoluteUri.ToString());
+
     }
 }

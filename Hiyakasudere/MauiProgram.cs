@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.WebView.Maui;
-using Hiyakasudere.Data;
-using Microsoft.Extensions.DependencyInjection;
-using Hiyakasudere.Data.ExternalAPI.Yandere;
+﻿using Hiyakasudere.Data.ExternalAPI.Yandere;
 using Hiyakasudere.Data.Internal.Config;
 using Hiyakasudere.Data.ExternalAPI.Safebooru;
 using Hiyakasudere.Data.Internal.Data.Post;
