@@ -22,7 +22,7 @@ namespace Hiyakasudere.Data.ExternalAPI.Yandere
         public long UpdatedAt { get; set; }
 
         [JsonProperty("creator_id")]
-        public long CreatorId { get; set; }
+        public long? CreatorId { get; set; }
 
         [JsonProperty("approver_id")]
         public object ApproverId { get; set; }

@@ -30,7 +30,6 @@ public class YanderePostService : IYanderePostService
             {
                 var content = await response.Content.ReadAsStringAsync();
                 yanderePosts = JsonConvert.DeserializeObject<IEnumerable<YanderePost>>(content);
-                //System.Diagnostics.Debug.WriteLine("Incoming Size: " + yanderePosts.Count());
             }
 
         }
@@ -42,24 +41,42 @@ public class YanderePostService : IYanderePostService
 
         return yanderePosts;
     }
-    public string GenerateRequestURL(int postsPerPage, int currentPage)
+    public string GenerateRequestURL(int postsPerPage, int currentPage, List<string> tags)
     {
         string requestUri = "https://yande.re/post.json";
         requestUri += $"?limit={postsPerPage}";
         requestUri += $"&page={currentPage}";
         requestUri += "&tags=";
-        //System.Diagnostics.Debug.WriteLine(_appConfigService.isNSFW);
+
+        if(tags.Any())
+        {
+            foreach(var tag in tags)
+            {
+                requestUri += tag.ToString()+" ";
+            }
+        }
 
         return requestUri;
     }
 
-    public async Task<int> GetYanderePostCount()
+    public async Task<int> GetYanderePostCount(List<string> tags)
     {
         int yanderePostCount = 0;
 
         try
         {
-            var response = await client.GetAsync("https://yande.re/post.xml?limit=1");
+            var req = "https://yande.re/post.xml?limit=1&tags=";
+
+            if (tags.Any())
+            {
+                foreach (var tag in tags)
+                {
+                    req += tag.ToString() + " ";
+                }
+            }
+
+            var response = await client.GetAsync(req);
+
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();

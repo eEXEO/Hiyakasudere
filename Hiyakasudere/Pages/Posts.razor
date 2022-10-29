@@ -6,7 +6,7 @@
 @inject IPostTranslationService PostService
 @inject IFileManager FileManager
 
-<h1 class="mb-3">Posts</h1>
+<input @onfocusout="@(DisplayPage)" type="text" class="form-control" value="@currentTags" id="postTempTags" placeholder="Enter tags" @oninput="(e) => {currentTags = e.Value.ToString(); UpdateTags();}">
 
 <div class="carousel slide carousel-dark text-center"
      data-mdb-ride="carousel">
@@ -58,28 +58,44 @@
     private IEnumerable<PostInternal> booruPosts;
 
     private int currentPage = 1;
+    private int availablePages = 1;
+    private string currentTags = "";
 
     protected override async Task OnInitializedAsync()
     {
         await DisplayPage();
     }
 
+    protected void UpdateTags()
+    {
+        PostService.UpdateTags(currentTags);
+    }
 
     protected async Task DisplayPage()
     {
+        availablePages = await PostService.GetPageCount();
         booruPosts = await PostService.GetPostData(currentPage);
+        currentTags = String.Join(" ", PostService.GetTags());
     }
 
     protected async Task NextPage()
     {
-        currentPage++;
-        await DisplayPage();
+        System.Diagnostics.Debug.WriteLine(currentPage + "__" + availablePages);
+        if (currentPage + 1 <= availablePages)
+        {
+            currentPage++;
+            await DisplayPage();
+        }
     }
 
     protected async Task PrevPage()
     {
-        currentPage--;
-        await DisplayPage();
+        if (currentPage - 1 >= 1)
+        {
+            currentPage--;
+            await DisplayPage();
+        }
+
     }
 
     private void ShowModal(int postId)
@@ -95,7 +111,6 @@
         var parameters = new ModalParameters().Add("PostData", booruPosts.ElementAt(postId));
 
         var modal = Modal.Show<ModalPostFull>("", parameters, options);
-
-        //DOWNLOAD IMAGE IF MODAL RET TRUE
+        System.Diagnostics.Debug.WriteLine(currentTags);
     }
 }

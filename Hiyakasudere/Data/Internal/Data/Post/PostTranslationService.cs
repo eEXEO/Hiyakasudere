@@ -12,12 +12,40 @@ namespace Hiyakasudere.Data.Internal.Data.Post
         readonly private IYanderePostService _yanderePostService;
         readonly private ISafebooruPostService _safebooruPostService;
 
+        private List<string> tags = new List<string>();
+
 
         public PostTranslationService(IAppConfigService appConfigService, IYanderePostService yanderePostService, ISafebooruPostService safebooruPostService)
         {
             _appConfigService = appConfigService;
             _yanderePostService = yanderePostService;
             _safebooruPostService = safebooruPostService;
+        }
+        public async Task<int> GetPageCount()
+        {
+            var count = 1;
+
+            switch (_appConfigService.SelectedSource)
+            {
+                case 1:
+                    count = await _yanderePostService.GetYanderePostCount(tags);
+                    break;
+                case 2:
+                    count = await _safebooruPostService.GetSafebooruPostCount(tags);
+                    break;
+            }
+
+            return count / _appConfigService.PostsPerPage;
+        }
+
+        public void UpdateTags(string tags)
+        {
+            this.tags = tags.Split(" ").ToList();
+        }
+
+        public List<string> GetTags()
+        {
+            return tags;
         }
 
         public async Task<IEnumerable<PostInternal>> GetPostData(int currentPage)
@@ -41,12 +69,10 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                 });
             }
 
-            System.Diagnostics.Debug.WriteLine("PostTranslationService: " + _appConfigService.SelectedSource + ", " + _appConfigService.PostsPerPage + ", ", _appConfigService.IsNSFW);
-
             switch (_appConfigService.SelectedSource)
             {
                 case 1:
-                    yanderePosts = await _yanderePostService.GetYandereData(_yanderePostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage));
+                    yanderePosts = await _yanderePostService.GetYandereData(_yanderePostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, tags));
 
                     foreach (YanderePost element in yanderePosts)
                     {
@@ -64,7 +90,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 
                 case 2:
                     //This is visible pain
-                    safebooruPosts = await _safebooruPostService.GetSafebooruData(_safebooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage));
+                    safebooruPosts = await _safebooruPostService.GetSafebooruData(_safebooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, tags));
                    
                     Uri source = null;
                     long loId = 0;

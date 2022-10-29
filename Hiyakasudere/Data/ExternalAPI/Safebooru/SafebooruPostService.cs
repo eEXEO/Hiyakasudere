@@ -19,7 +19,7 @@ namespace Hiyakasudere.Data.ExternalAPI.Safebooru
             serializer = new XmlSerializer(typeof(SafebooruPosts));
         }
 
-        public string GenerateRequestURL(int postsPerPage, int currentPage)
+        public string GenerateRequestURL(int postsPerPage, int currentPage, List<string> tags)
         {
             currentPage -= 1;
             string requestUri = "https://safebooru.org/index.php?page=dapi&s=post&q=index";
@@ -27,16 +27,34 @@ namespace Hiyakasudere.Data.ExternalAPI.Safebooru
             requestUri += $"&pid={currentPage}";
             requestUri += "&tags=";
 
+            if (tags.Any())
+            {
+                foreach (var tag in tags)
+                {
+                    requestUri += tag.ToString() + " ";
+                }
+            }
+
             return requestUri;
         }
 
-        public async Task<int> GetSafebooruPostCount()
+        public async Task<int> GetSafebooruPostCount(List<string> tags)
         {
             int safebooruPostCount = 0;
 
+            var req = "https://safebooru.org/index.php?page=dapi&s=post&q=index&limit=0&tags=";
+
+            if (tags.Any())
+            {
+                foreach (var tag in tags)
+                {
+                    req += tag.ToString() + " ";
+                }
+            }
+
             try
             {
-                var response = await client.GetAsync("https://safebooru.org/index.php?page=dapi&s=post&q=index&limit=0");
+                var response = await client.GetAsync(req);
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
