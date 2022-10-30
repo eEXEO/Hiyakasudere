@@ -3,6 +3,8 @@ using Hiyakasudere.Data.ExternalAPI;
 using Hiyakasudere.Data.ExternalAPI.Yandere;
 using Hiyakasudere.Data.ExternalAPI.Safebooru;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using Microsoft.Maui.Controls;
 
 namespace Hiyakasudere.Data.Internal.Data.Post
 {
@@ -12,7 +14,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
         readonly private IYanderePostService _yanderePostService;
         readonly private ISafebooruPostService _safebooruPostService;
 
-        private List<string> tags = new List<string>();
+        private List<TagInternal> tags = new();
 
 
         public PostTranslationService(IAppConfigService appConfigService, IYanderePostService yanderePostService, ISafebooruPostService safebooruPostService)
@@ -21,29 +23,57 @@ namespace Hiyakasudere.Data.Internal.Data.Post
             _yanderePostService = yanderePostService;
             _safebooruPostService = safebooruPostService;
         }
+
+        protected List<string> GetSimplefiedTags()
+        {
+            List<string> temp = new();
+
+            temp.Add("");
+
+            try
+            {
+                foreach (TagInternal tag in tags)
+                {
+                    temp.Add(tag.Name);
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return temp;
+        }
+
         public async Task<int> GetPageCount()
         {
             var count = 1;
 
+            
             switch (_appConfigService.SelectedSource)
             {
                 case 1:
-                    count = await _yanderePostService.GetYanderePostCount(tags);
+                    count = await _yanderePostService.GetYanderePostCount(GetSimplefiedTags());
                     break;
                 case 2:
-                    count = await _safebooruPostService.GetSafebooruPostCount(tags);
+                    count = await _safebooruPostService.GetSafebooruPostCount(GetSimplefiedTags());
                     break;
             }
 
             return count / _appConfigService.PostsPerPage;
         }
 
-        public void UpdateTags(string tags)
+        public void UpdateTags(List<TagInternal> tags)
         {
-            this.tags = tags.Split(" ").ToList();
+            this.tags = tags;
+
+            foreach (TagInternal tag in tags)
+            {
+                Debug.WriteLine(tag.Name);
+            }
         }
 
-        public List<string> GetTags()
+        public List<TagInternal> GetTags()
         {
             return tags;
         }
@@ -72,7 +102,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
             switch (_appConfigService.SelectedSource)
             {
                 case 1:
-                    yanderePosts = await _yanderePostService.GetYandereData(_yanderePostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, tags));
+                    yanderePosts = await _yanderePostService.GetYandereData(_yanderePostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
 
                     foreach (YanderePost element in yanderePosts)
                     {
@@ -90,7 +120,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 
                 case 2:
                     //This is visible pain
-                    safebooruPosts = await _safebooruPostService.GetSafebooruData(_safebooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, tags));
+                    safebooruPosts = await _safebooruPostService.GetSafebooruData(_safebooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
                    
                     Uri source = null;
                     long loId = 0;
@@ -140,5 +170,18 @@ namespace Hiyakasudere.Data.Internal.Data.Post
             return posts;
         }
 
+        public async Task<IEnumerable<TagInternal>> TryAutocompleteTag(string partialTag)
+        {
+            List<TagInternal> tagInternal = new();
+
+            var yandereTags = await _yanderePostService.GetTagsAutocompletion(partialTag);
+
+            tagInternal.Add(new TagInternal(0, partialTag, 1, 1, false));
+            foreach (YandereTag tag in yandereTags)
+            {
+                tagInternal.Add(new TagInternal(tag.Id, tag.Name, tag.Count, tag.Type, tag.Ambiguous));
+            }
+            return tagInternal.AsEnumerable(); 
+        }
     }
 }

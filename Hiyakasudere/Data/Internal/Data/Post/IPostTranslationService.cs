@@ -3,8 +3,10 @@
     public interface IPostTranslationService
     {
         Task<IEnumerable<PostInternal>> GetPostData(int currentPage);
-        void UpdateTags(string tags);
+        void UpdateTags(List<TagInternal> tags);
         Task<int> GetPageCount();
-        List<string> GetTags();
+        List<TagInternal> GetTags();
+
+        Task<IEnumerable<TagInternal>> TryAutocompleteTag(string partialTag);
     }
 }

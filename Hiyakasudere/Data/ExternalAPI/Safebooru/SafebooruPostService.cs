@@ -19,7 +19,7 @@ namespace Hiyakasudere.Data.ExternalAPI.Safebooru
             serializer = new XmlSerializer(typeof(SafebooruPosts));
         }
 
-        public string GenerateRequestURL(int postsPerPage, int currentPage, List<string> tags)
+        public string GenerateRequestURL(int postsPerPage, int currentPage, List<string> tags, List<string> blackTags)
         {
             currentPage -= 1;
             string requestUri = "https://safebooru.org/index.php?page=dapi&s=post&q=index";
@@ -32,6 +32,14 @@ namespace Hiyakasudere.Data.ExternalAPI.Safebooru
                 foreach (var tag in tags)
                 {
                     requestUri += tag.ToString() + " ";
+                }
+            }
+
+            if (blackTags.Any())
+            {
+                foreach (var tag in blackTags)
+                {
+                    requestUri += "-" + tag.ToString() + "+";
                 }
             }
 

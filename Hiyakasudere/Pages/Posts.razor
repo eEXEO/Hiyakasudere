@@ -3,10 +3,34 @@
 @using Hiyakasudere.Data.Internal.Config
 @using Hiyakasudere.Data.Internal.MultiplatformInterfaces
 @using Hiyakasudere.Pages.Modals
+@using Blazored.Typeahead
+
 @inject IPostTranslationService PostService
 @inject IFileManager FileManager
 
-<input @onfocusout="@(DisplayPage)" type="text" class="form-control" value="@currentTags" id="postTempTags" placeholder="Enter tags" @oninput="(e) => {currentTags = e.Value.ToString(); UpdateTags();}">
+<form class="row justify-content-center g-3">
+    <div class="col-md-10">
+        <BlazoredTypeahead SearchMethod="GetMatchingTags" @bind-Values="SelectedTagsList" MinimumLength="2" class="col">
+            <SelectedTemplate>
+                @context.Name
+            </SelectedTemplate>
+            <HelpTemplate>
+                Please enter a minimum of 2 characters to perform a search.
+            </HelpTemplate>
+            <ResultTemplate>
+                @context.Name
+            </ResultTemplate>
+        </BlazoredTypeahead>
+
+    </div>
+    <div class="col-md-2">
+        <div class="d-grid gap-2 mx-auto">
+            <button class="btn btn-danger" @onclick="@(() => UpdateTags())">Search</button>
+        </div>
+    </div>
+</form>
+
+<hr>
 
 <div class="carousel slide carousel-dark text-center"
      data-mdb-ride="carousel">
@@ -63,19 +87,21 @@
 
     protected override async Task OnInitializedAsync()
     {
+        SelectedTagsList = new List<TagInternal>();
         await DisplayPage();
     }
 
-    protected void UpdateTags()
+    protected async Task UpdateTags()
     {
-        PostService.UpdateTags(currentTags);
+        PostService.UpdateTags(SelectedTagsList.ToList());
+        await DisplayPage();
     }
 
     protected async Task DisplayPage()
     {
+        SelectedTagsList = PostService.GetTags();
         availablePages = await PostService.GetPageCount();
         booruPosts = await PostService.GetPostData(currentPage);
-        currentTags = String.Join(" ", PostService.GetTags());
     }
 
     protected async Task NextPage()
@@ -113,4 +139,12 @@
         var modal = Modal.Show<ModalPostFull>("", parameters, options);
         System.Diagnostics.Debug.WriteLine(currentTags);
     }
+
+    private IList<TagInternal>? SelectedTagsList;
+
+    protected async Task<IEnumerable<TagInternal>> GetMatchingTags(string searchText)
+    {
+        return await PostService.TryAutocompleteTag(searchText);
+    }
+    
 }

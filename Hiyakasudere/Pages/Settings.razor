@@ -1,10 +1,15 @@
 ﻿@page "/settings"
 @using Hiyakasudere.Data.Internal.Config
 @using Hiyakasudere.Data.Internal.MultiplatformInterfaces
+@using Hiyakasudere.Data.Internal.Data.Post
+@using Blazored.Typeahead
 @inject IAppConfigService _appConfig;
+@inject IPostTranslationService _postService;
 @inject IFileManager _fileManager;
 
 <h1>Settings</h1>
+
+<hr>
 
 @if(configDataModel != null)
 {
@@ -13,6 +18,22 @@
             <label>
                 NSFW Enabler:
                 <InputCheckbox @bind-Value="configDataModel.NSFWEnabled"></InputCheckbox>
+            </label>
+        </p>
+        <p>
+            <label>
+                Tag blacklist:
+                <BlazoredTypeahead SearchMethod="GetMatchingTags" @bind-Values="SelectedBlacklistedTags" MinimumLength="2">
+                    <SelectedTemplate Context="BLTag">
+                        @BLTag.Name
+                    </SelectedTemplate>
+                    <HelpTemplate>
+                        Please enter a minimum of 2 characters to perform a search.
+                    </HelpTemplate>
+                    <ResultTemplate Context="BLTag">
+                        @BLTag.Name
+                    </ResultTemplate>
+                </BlazoredTypeahead>
             </label>
         </p>
         <p>
@@ -47,15 +68,22 @@
 @code {
 
     private ConfigDataModel configDataModel;
+    private IList<TagInternal>? SelectedBlacklistedTags;
+
+    protected async Task<IEnumerable<TagInternal>> GetMatchingTags(string searchText)
+    {
+        return await _postService.TryAutocompleteTag(searchText);
+    }
 
     protected override void OnInitialized()
     {
         configDataModel = _appConfig.GetCurrentConfiguration();
+        SelectedBlacklistedTags = configDataModel.BlackListedTags;
     }
 
     private void HandleValidSubmit()
     {
-        _appConfig.UpdateConfig(configDataModel.SelectedSource, configDataModel.PostsPerPage, configDataModel.NSFWEnabled);
+        _appConfig.UpdateConfig(configDataModel.SelectedSource, configDataModel.PostsPerPage, configDataModel.NSFWEnabled, SelectedBlacklistedTags.ToList());
     }
 
     private void OpenSaveDir()

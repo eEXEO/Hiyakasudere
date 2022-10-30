@@ -63,7 +63,8 @@
 
     <ItemGroup>
       <PackageReference Include="Blazored.Modal" Version="7.1.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.9" />
+      <PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.10" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 

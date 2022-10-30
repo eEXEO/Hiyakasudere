@@ -30,7 +30,7 @@ public static class MauiProgram
 
         builder.Services.AddBlazoredModal();
 
-		builder.Services.AddSingleton<IYanderePostService, YanderePostService>();
+        builder.Services.AddSingleton<IYanderePostService, YanderePostService>();
         builder.Services.AddSingleton<ISafebooruPostService, SafebooruPostService>();
 		builder.Services.AddSingleton<IPostTranslationService, PostTranslationService>();
         builder.Services.AddSingleton<IAppConfigService, AppConfigService>();

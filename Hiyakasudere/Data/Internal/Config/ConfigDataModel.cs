@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Hiyakasudere.Data.Internal.Data.Post;
 
 namespace Hiyakasudere.Data.Internal.Config
 {
@@ -9,14 +10,14 @@ namespace Hiyakasudere.Data.Internal.Config
             SelectedSource = 1;
             PostsPerPage = 12;
             NSFWEnabled = false;
-            ImageSavePath = "";
+            BlackListedTags = new();
         }
-        public ConfigDataModel(int selectedSource, int postsPerPage, bool nSFWEnabled, string imageSavePath)
+        public ConfigDataModel(int selectedSource, int postsPerPage, bool nSFWEnabled, List<TagInternal> blackListedTags)
         {
             SelectedSource = selectedSource;
             PostsPerPage = postsPerPage;
             NSFWEnabled = nSFWEnabled;
-            ImageSavePath = imageSavePath;
+            BlackListedTags = blackListedTags;
         }
 
         [Required]
@@ -33,7 +34,7 @@ namespace Hiyakasudere.Data.Internal.Config
         public bool NSFWEnabled { get; set; }
 
         [Required]
-        public string ImageSavePath { get; set; }
+        public List<TagInternal> BlackListedTags { get; set; } 
 
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Hiyakasudere.Data.Internal.Config;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections;
+using System.Diagnostics;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -41,7 +43,7 @@ public class YanderePostService : IYanderePostService
 
         return yanderePosts;
     }
-    public string GenerateRequestURL(int postsPerPage, int currentPage, List<string> tags)
+    public string GenerateRequestURL(int postsPerPage, int currentPage, List<string> tags, List<string> blackTags)
     {
         string requestUri = "https://yande.re/post.json";
         requestUri += $"?limit={postsPerPage}";
@@ -56,10 +58,44 @@ public class YanderePostService : IYanderePostService
             }
         }
 
+        if (blackTags.Any())
+        {
+            foreach (var tag in blackTags)
+            {
+                requestUri += "-" + tag.ToString() + "+";
+            }
+        }
+
         return requestUri;
     }
 
-    public async Task<int> GetYanderePostCount(List<string> tags)
+    public async Task<IEnumerable<YandereTag>> GetTagsAutocompletion(string partialTag)
+    {
+        IEnumerable<YandereTag> results = null;
+
+        try
+        {
+            var req = "https://yande.re/tag.json?limit=10&name=" + partialTag;
+
+            var response = await client.GetAsync(req);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+
+                results = JsonConvert.DeserializeObject<IEnumerable<YandereTag>>(content);
+            }
+        }
+        catch (Exception e)
+        {
+            System.Diagnostics.Debug.WriteLine(e.Message);
+            throw;
+        }
+
+        return results;
+    }
+
+        public async Task<int> GetYanderePostCount(List<string> tags)
     {
         int yanderePostCount = 0;
 
