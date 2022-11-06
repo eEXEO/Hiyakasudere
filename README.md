@@ -29,3 +29,5 @@ For now you have to compile app by Yourself. Public build will come in form of w
 ![Preview Image no. 2](/DemoMultimediaFiles/apppreview_2.png)
 
 ![Preview Image no. 3](/DemoMultimediaFiles/apppreview_3.png)
+
+![Preview Image no. 4](/DemoMultimediaFiles/apppreview_4.png)
