@@ -21,24 +21,33 @@
 }
 else
 {
-    <img src="@imgData" class="card-img-top rounded img-fluid" id="fullImageImg">
+    <div style="max-height: calc(@maxHeight); max-width: @maxWidth;">
+        <img src="@imgData" class="rounded img-fluid mx-auto d-block" style="height: @maxHeight; object-fit: contain;" id="fullImageImg">
 
-    <div class="d-flex justify-content-center flex-nowrap" style="padding: 5px">
-        <input class="btn btn-primary" value="Save Image" @onclick="SaveImage">
+        <div class="d-flex justify-content-center flex-nowrap" style="padding: 5px">
+            <input class="btn btn-danger" style="margin:5px" value="Save Image" @onclick="SaveImage">
+            <input class="btn btn-danger" style="margin:5px" value="Close" @onclick="Close">
+            <input class="btn btn-danger" style="margin:5px" value="More info" @onclick="ShowMoreInfo">
+        </div>
     </div>
-    
 }
 
 @code {
     private PostInternal booruPost = null;
     private IJSObjectReference module;
     private string imgData = null;
+    private string maxHeight = "100px"; 
+    private string maxWidth = "100px";
+
 
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] IModalService Modal { get; set; } = default!;
     [Parameter] public PostInternal PostData { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        maxHeight = Convert.ToInt32(Application.Current.MainPage.Height * 0.8).ToString() + "px";
+        maxWidth = Convert.ToInt32(Application.Current.MainPage.Width * 0.8).ToString() + "px";
         booruPost = PostData;
         module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/Modals/ModalPostFull.razor.js");
 
@@ -52,5 +61,25 @@ else
 
         await FileManager.SaveImage(imgData, "Hiyakasudere" + "_" + DateTime.Now.ToFileTime());
 
+    }
+    protected async Task Close()
+    {
+        await BlazoredModal.CloseAsync();
+    }
+    protected async Task ShowMoreInfo()
+    {
+
+        var options = new ModalOptions()
+            {
+                HideCloseButton = true,
+                HideHeader = true,
+                Position = ModalPosition.Middle,
+                Size = ModalSize.Automatic
+            };
+
+        var parameters = new ModalParameters().Add("PostInfo", booruPost);
+
+        var infoModal = Modal.Show<ModalPostInfo>("PostInfoModal", parameters, options);
+        var res = await infoModal.Result;
     }
 }

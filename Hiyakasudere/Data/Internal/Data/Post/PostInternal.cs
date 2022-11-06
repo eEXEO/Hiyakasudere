@@ -9,7 +9,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 {
     public class PostInternal
     {
-        public PostInternal(long id, string tags, string createdAt, string author, Uri? source, long score, Uri previewUrl, long previewWidth, long previewHeight, Uri sampleUrl, long sampleWidth, long sampleHeight, Uri originalUrl, long originalWidth, long originalHeight, long? originalFileSize, string rating, bool hasChildren)
+        public PostInternal(long id, string tags, DateTime createdAt, string author, Uri? source, long score, Uri previewUrl, long previewWidth, long previewHeight, Uri sampleUrl, long sampleWidth, long sampleHeight, Uri originalUrl, long originalWidth, long originalHeight, float originalFileSize, string rating, bool hasChildren)
         {
             Id = id;
             Tags = tags;
@@ -35,7 +35,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 
         public string Tags { get; set; }
 
-        public string CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public long ?UpdatedAt { get; set; }
 
@@ -85,7 +85,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 
         public long OriginalHeight { get; set; }
 
-        public long? OriginalFileSize { get; set; }
+        public float OriginalFileSize { get; set; }
 
         public string? Rating { get; set; }
 

@@ -5,6 +5,7 @@ using Hiyakasudere.Data.ExternalAPI.Safebooru;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Microsoft.Maui.Controls;
+using System.Globalization;
 
 namespace Hiyakasudere.Data.Internal.Data.Post
 {
@@ -84,6 +85,9 @@ namespace Hiyakasudere.Data.Internal.Data.Post
             IEnumerable<YanderePost> yanderePosts = null;
             IEnumerable<SafebooruPost> safebooruPosts = null;
 
+            //temp vars
+            DateTime loDate = new DateTime();
+
             List<PostInternal> temp = new();
 
             if(_appConfigService.IsLoaded is false)
@@ -104,15 +108,33 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                 case 1:
                     yanderePosts = await _yanderePostService.GetYandereData(_yanderePostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
 
+                    loDate = new DateTime();
+
                     foreach (YanderePost element in yanderePosts)
                     {
                         //(first letter from - safe, questionable, explict)
                         if (_appConfigService.IsNSFW is false && element.Rating.Equals("e") || _appConfigService.IsNSFW is false && element.Rating.Equals("q")) continue;
 
-                        temp.Add(new PostInternal(element.Id, element.Tags, "", element.Author, element.Source, 
+                        //Translate rating value
+                        if (element.Rating.Equals("e"))
+                        {
+                            element.Rating = "Explict";
+                        }
+                        else if (element.Rating.Equals("q"))
+                        {
+                            element.Rating = "Questionable";
+                        }
+                        else if (element.Rating.Equals("s"))
+                        {
+                            element.Rating = "Safe";
+                        }
+
+                        loDate = DateTimeOffset.FromUnixTimeSeconds(element.CreatedAt).UtcDateTime;
+
+                        temp.Add(new PostInternal(element.Id, element.Tags, loDate, element.Author, element.Source, 
                             element.Score, element.PreviewUrl, element.PreviewWidth, element.PreviewHeight, element.SampleUrl,
                             element.SampleWidth, element.SampleHeight, element.FileUrl, element.Width, element.Height,
-                            element.FileSize, element.Rating, element.HasChildren));
+                            element.FileSize / 1048576.0f, element.Rating, element.HasChildren));
                     }
 
                     posts = temp.AsEnumerable<PostInternal>();
@@ -123,6 +145,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                     safebooruPosts = await _safebooruPostService.GetSafebooruData(_safebooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
                    
                     Uri source = null;
+                    loDate = new DateTime();
                     long loId = 0;
                     long loScore = 0;
                     long loPrWidth = 0;
@@ -150,14 +173,31 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                             loWidth = long.Parse(element.Width);
                             loHeight = long.Parse(element.Height);
                             loHasChildren = bool.Parse(element.Has_children);
-                        }catch(Exception)
+
+                            //Translate rating value
+                            if (element.Rating.Equals("q"))
+                            {
+                                element.Rating = "General";
+                            }
+                            else if (element.Rating.Equals("s"))
+                            {
+                                element.Rating = "Safe";
+                            }
+
+                            //Parse date
+                            element.Created_at = element.Created_at.Insert(element.Created_at.IndexOf("+") + 3, ":");
+                            loDate = DateTime.ParseExact(element.Created_at, "ddd MMM dd H:mm:ss zzz yyyy", CultureInfo.GetCultureInfo("en-US"));
+
+                        }
+                        catch(Exception e)
                         {
+                            System.Diagnostics.Debug.WriteLine(e);
                             System.Diagnostics.Debug.WriteLine("Everything is fine!");
                         }
 
-                        temp.Add(new PostInternal(loId, element.Tags, element.Created_at, element.Creator_id, source,
+                        temp.Add(new PostInternal(loId, element.Tags, loDate, element.Creator_id, source,
                             loScore, new Uri(element.Preview_url), loPrWidth, loPrHeight, new Uri(element.Sample_url),
-                            loSaWidth, loSaHeight, new Uri(element.File_url), loWidth, loHeight, null,
+                            loSaWidth, loSaHeight, new Uri(element.File_url), loWidth, loHeight, 0f,
                             element.Rating, loHasChildren));
                     }
 

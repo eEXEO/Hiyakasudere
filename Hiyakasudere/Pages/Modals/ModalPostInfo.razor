@@ -1,0 +1,89 @@
+﻿@page "/modals/postfullinfo"
+@using Microsoft.Maui
+@using Hiyakasudere.Data.Internal.Data.Post
+@using System.Globalization;
+@if (booruPost == null)
+{
+
+    <div class="d-flex justify-content-center flex-nowrap" style="padding: 5px">
+        <div class="align-self-center">
+            <div class="spinner-grow text-danger" role="status"></div>
+        </div>
+    </div>
+
+}
+else
+{
+    <div>
+        <table class="table table-sm">
+            <tbody>
+                <tr>
+                    <td>Width:</td>
+                    <td>@PostInfo.OriginalWidth</td>
+                </tr>
+                <tr>
+                    <td>Height:</td>
+                    <td>@PostInfo.OriginalHeight</td>
+                </tr>
+                <tr>
+                    <td>Size:</td>
+                    <td>@fileSize</td>
+                </tr>
+                <tr>
+                    <td>Created at:</td>
+                    <td>@PostInfo.CreatedAt.ToString(CultureInfo.CurrentCulture)</td>
+                </tr>
+                <tr>
+                    <td>Source:</td>
+                    <td><a href="@PostInfo.Source">@PostInfo.Source</a></td>
+                </tr>
+                <tr>
+                    <td>Author:</td>
+                    <td>@PostInfo.Author</td>
+                </tr>
+                <tr>
+                    <td>Score:</td>
+                    <td>@PostInfo.Score</td>
+                </tr>
+                <tr>
+                    <td>Rating:</td>
+                    <td>@PostInfo.Rating</td>
+                </tr>
+                <tr>
+                    <td>Tags:</td>
+                    <td><p>@PostInfo.Tags</p></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="d-flex justify-content-center flex-nowrap" style="padding: 5px">
+    <input class="btn btn-danger gap-1" value="Close" @onclick="Close">
+</div>
+
+@code {
+    private PostInternal booruPost = null;
+    private string fileSize = "Unknown";
+
+
+    [CascadingParameter] BlazoredModalInstance BlazoredInfoModal { get; set; } = default!;
+    [Parameter] public PostInternal PostInfo { get; set; }
+
+    protected override void OnInitialized()
+    {
+        booruPost = PostInfo;
+        if (booruPost.OriginalFileSize == 0f)
+        {
+            fileSize = "Unknown";
+        }else
+        {
+            fileSize = booruPost.OriginalFileSize.ToString("0.00") + " MB";
+        }        
+    }
+
+    protected async Task Close()
+    {
+        await BlazoredInfoModal.CloseAsync();
+    }
+}
