@@ -13,7 +13,7 @@ As mentioned above, it is new booru client. List of supported services is presen
 
 Hiyakasudere uses following technologies:
 
-- .NET MAUI - "cross-platform" framework for creating multiplatform apps
+- .NET MAUI - "cross-platform" framework for creating apps
 
 **Language:** C# + .NET Core 6
 
