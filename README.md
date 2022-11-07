@@ -5,7 +5,7 @@ As mentioned above, it is new booru client. List of supported services is presen
 
 ## Supported services
 
-- Yande.re
+- [Yande.re](https://yande.re/)
 - [Safebooru](https://safebooru.org/)
 - [Gelbooru](https://gelbooru.com/) (WIP)
 
