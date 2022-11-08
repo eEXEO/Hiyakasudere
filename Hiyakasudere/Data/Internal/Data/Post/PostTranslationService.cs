@@ -63,6 +63,9 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                 case 2:
                     count = await _safebooruPostService.GetSafebooruPostCount(GetSimplefiedTags());
                     break;
+                case 3:
+                    count = await _konachanPostService.GetKonachanPostCount(GetSimplefiedTags());
+                    break;
             }
 
             return count / _appConfigService.PostsPerPage;
