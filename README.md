@@ -7,6 +7,7 @@ As mentioned above, it is new booru client. List of supported services is presen
 
 - [Yande.re](https://yande.re/)
 - [Safebooru](https://safebooru.org/)
+- [Kona-chan](https://konachan.com/)
 - [Gelbooru](https://gelbooru.com/) (WIP)
 
 ## Tech

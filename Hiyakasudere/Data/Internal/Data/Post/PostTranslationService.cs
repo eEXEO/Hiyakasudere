@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Microsoft.Maui.Controls;
 using System.Globalization;
+using Hiyakasudere.Data.ExternalAPI.Konachan;
 
 namespace Hiyakasudere.Data.Internal.Data.Post
 {
@@ -14,15 +15,18 @@ namespace Hiyakasudere.Data.Internal.Data.Post
         readonly private IAppConfigService _appConfigService;
         readonly private IYanderePostService _yanderePostService;
         readonly private ISafebooruPostService _safebooruPostService;
+        readonly private IKonachanPostService _konachanPostService;
 
         private List<TagInternal> tags = new();
 
 
-        public PostTranslationService(IAppConfigService appConfigService, IYanderePostService yanderePostService, ISafebooruPostService safebooruPostService)
+        public PostTranslationService(IAppConfigService appConfigService, IYanderePostService yanderePostService, 
+            ISafebooruPostService safebooruPostService, IKonachanPostService konachanPostService)
         {
             _appConfigService = appConfigService;
             _yanderePostService = yanderePostService;
             _safebooruPostService = safebooruPostService;
+            _konachanPostService = konachanPostService;
         }
 
         protected List<string> GetSimplefiedTags()
@@ -84,6 +88,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
             IEnumerable<PostInternal> posts = null;
             IEnumerable<YanderePost> yanderePosts = null;
             IEnumerable<SafebooruPost> safebooruPosts = null;
+            IEnumerable<KonachanPost> konachanPosts = null;
 
             //temp vars
             DateTime loDate = new DateTime();
@@ -199,6 +204,41 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                             loScore, new Uri(element.Preview_url), loPrWidth, loPrHeight, new Uri(element.Sample_url),
                             loSaWidth, loSaHeight, new Uri(element.File_url), loWidth, loHeight, 0f,
                             element.Rating, loHasChildren));
+                    }
+
+                    posts = temp.AsEnumerable<PostInternal>();
+                    break;
+
+                case 3:
+                    konachanPosts = await _konachanPostService.GetKonachanData(_konachanPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
+
+                    loDate = new DateTime();
+
+                    foreach (KonachanPost element in konachanPosts)
+                    {
+                        //(first letter from - safe, questionable, explict)
+                        if (_appConfigService.IsNSFW is false && element.Rating.Equals("e") || _appConfigService.IsNSFW is false && element.Rating.Equals("q")) continue;
+
+                        //Translate rating value
+                        if (element.Rating.Equals("e"))
+                        {
+                            element.Rating = "Explict";
+                        }
+                        else if (element.Rating.Equals("q"))
+                        {
+                            element.Rating = "Questionable";
+                        }
+                        else if (element.Rating.Equals("s"))
+                        {
+                            element.Rating = "Safe";
+                        }
+
+                        loDate = DateTimeOffset.FromUnixTimeSeconds(element.CreatedAt).UtcDateTime;
+
+                        temp.Add(new PostInternal(element.Id, element.Tags, loDate, element.Author, element.Source,
+                            element.Score, element.PreviewUrl, element.PreviewWidth, element.PreviewHeight, element.SampleUrl,
+                            element.SampleWidth, element.SampleHeight, element.FileUrl, element.Width, element.Height,
+                            element.FileSize / 1048576.0f, element.Rating, element.HasChildren));
                     }
 
                     posts = temp.AsEnumerable<PostInternal>();

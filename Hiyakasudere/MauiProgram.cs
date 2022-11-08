@@ -5,6 +5,7 @@ using Hiyakasudere.Data.Internal.Data.Post;
 using Blazored.Modal;
 using Hiyakasudere.Data.Internal.MultiplatformInterfaces;
 using Hiyakasudere.Data.Internal.Functionality.ImageUtils;
+using Hiyakasudere.Data.ExternalAPI.Konachan;
 
 namespace Hiyakasudere;
 
@@ -33,6 +34,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IYanderePostService, YanderePostService>();
         builder.Services.AddSingleton<ISafebooruPostService, SafebooruPostService>();
 		builder.Services.AddSingleton<IPostTranslationService, PostTranslationService>();
+        builder.Services.AddSingleton<IKonachanPostService, KonachanPostService>();
         builder.Services.AddSingleton<IAppConfigService, AppConfigService>();
         builder.Services.AddSingleton<IImageNetUtils, ImageNetUtils>();
         
