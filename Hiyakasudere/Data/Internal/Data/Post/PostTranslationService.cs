@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Microsoft.Maui.Controls;
 using System.Globalization;
 using Hiyakasudere.Data.ExternalAPI.Konachan;
+using Hiyakasudere.Data.ExternalAPI.Gelbooru;
 
 namespace Hiyakasudere.Data.Internal.Data.Post
 {
@@ -16,17 +17,19 @@ namespace Hiyakasudere.Data.Internal.Data.Post
         readonly private IYanderePostService _yanderePostService;
         readonly private ISafebooruPostService _safebooruPostService;
         readonly private IKonachanPostService _konachanPostService;
+        readonly private IGelbooruPostService _gelbooruPostService;
 
         private List<TagInternal> tags = new();
 
 
         public PostTranslationService(IAppConfigService appConfigService, IYanderePostService yanderePostService, 
-            ISafebooruPostService safebooruPostService, IKonachanPostService konachanPostService)
+            ISafebooruPostService safebooruPostService, IKonachanPostService konachanPostService, IGelbooruPostService gelbooruPostService)
         {
             _appConfigService = appConfigService;
             _yanderePostService = yanderePostService;
             _safebooruPostService = safebooruPostService;
             _konachanPostService = konachanPostService;
+            _gelbooruPostService = gelbooruPostService;
         }
 
         protected List<string> GetSimplefiedTags()
@@ -66,6 +69,9 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                 case 3:
                     count = await _konachanPostService.GetKonachanPostCount(GetSimplefiedTags());
                     break;
+                case 4:
+                    count = await _gelbooruPostService.GetGelbooruPostCount(GetSimplefiedTags());
+                    break;
             }
 
             return count / _appConfigService.PostsPerPage;
@@ -92,9 +98,23 @@ namespace Hiyakasudere.Data.Internal.Data.Post
             IEnumerable<YanderePost> yanderePosts = null;
             IEnumerable<SafebooruPost> safebooruPosts = null;
             IEnumerable<KonachanPost> konachanPosts = null;
+            IEnumerable<GelbooruPost> gelbooruPosts = null;
 
             //temp vars
             DateTime loDate = new DateTime();
+            Uri source = null;
+            Uri preview = null;
+            Uri sample = null;
+            loDate = new DateTime();
+            long loId = 0;
+            long loScore = 0;
+            long loPrWidth = 0;
+            long loPrHeight = 0;
+            long loSaWidth = 0;
+            long loSaHeight = 0;
+            long loWidth = 0;
+            long loHeight = 0;
+            bool loHasChildren = false;
 
             List<PostInternal> temp = new();
 
@@ -152,18 +172,6 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                     //This is visible pain
                     safebooruPosts = await _safebooruPostService.GetSafebooruData(_safebooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
                    
-                    Uri source = null;
-                    loDate = new DateTime();
-                    long loId = 0;
-                    long loScore = 0;
-                    long loPrWidth = 0;
-                    long loPrHeight = 0;
-                    long loSaWidth = 0;
-                    long loSaHeight = 0;
-                    long loWidth = 0;
-                    long loHeight = 0;
-                    bool loHasChildren = false;
-
                     foreach (SafebooruPost element in safebooruPosts)
                     {
                         //This source is safe for viewer, so no precautions taken
@@ -242,6 +250,70 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                             element.Score, element.PreviewUrl, element.PreviewWidth, element.PreviewHeight, element.SampleUrl,
                             element.SampleWidth, element.SampleHeight, element.FileUrl, element.Width, element.Height,
                             element.FileSize / 1048576.0f, element.Rating, element.HasChildren));
+                    }
+
+                    posts = temp.AsEnumerable<PostInternal>();
+                    break;
+                case 4: //gelbooru
+                    //API is inconsistent FFS
+
+                    gelbooruPosts = await _gelbooruPostService.GetGelbooruData(_gelbooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
+
+                    foreach (GelbooruPost element in gelbooruPosts)
+                    {
+                        
+                        //API is inconsistent FFS
+                        source = null;
+                        try
+                        {
+                            Uri.TryCreate(element.Source, UriKind.RelativeOrAbsolute, out source);
+                            loId = element.Id;
+                            loScore = element.Score;
+                            loSaWidth = element.SampleWidth;
+                            loSaHeight = element.SampleHeight;
+                            loPrWidth = element.PreviewWidth;
+                            loPrHeight = element.PreviewHeight;
+                            loWidth = element.Width;
+                            loHeight = element.Height;
+                            loHasChildren = element.HasChildren;
+
+                            //Translate rating value
+                            if (element.Rating.Equals("q"))
+                            {
+                                element.Rating = "General";
+                            }
+                            else if (element.Rating.Equals("s"))
+                            {
+                                element.Rating = "Safe";
+                            }
+
+                            //Parse date
+                            if(element.CreatedAt.IndexOf("+") != -1)
+                            {
+                                element.CreatedAt = element.CreatedAt.Insert(element.CreatedAt.IndexOf("+") + 3, ":");
+                            }
+                            else
+                            {
+                                element.CreatedAt = element.CreatedAt.Insert(element.CreatedAt.IndexOf("-") + 3, ":");
+                            }
+
+                            loDate = DateTime.ParseExact(element.CreatedAt, "ddd MMM dd H:mm:ss zzz yyyy", CultureInfo.GetCultureInfo("en-US"));
+
+
+                            Uri.TryCreate(element.SampleUrl, UriKind.RelativeOrAbsolute, out sample);
+                            Uri.TryCreate(element.PreviewUrl, UriKind.RelativeOrAbsolute, out preview);
+
+                        }
+                        catch (Exception e)
+                        {
+                            System.Diagnostics.Debug.WriteLine(e);
+                            System.Diagnostics.Debug.WriteLine("Everything is fine!");
+                        }
+
+                        temp.Add(new PostInternal(loId, element.Tags, loDate, element.CreatorId.ToString(), source,
+                            loScore, preview, loPrWidth, loPrHeight, preview,
+                            loSaWidth, loSaHeight, new Uri(element.FileUrl), loWidth, loHeight, 0f,
+                            element.Rating, loHasChildren));
                     }
 
                     posts = temp.AsEnumerable<PostInternal>();
