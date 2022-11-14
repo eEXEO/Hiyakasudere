@@ -7,6 +7,7 @@ using Hiyakasudere.Data.Internal.MultiplatformInterfaces;
 using Hiyakasudere.Data.Internal.Functionality.ImageUtils;
 using Hiyakasudere.Data.ExternalAPI.Konachan;
 using Hiyakasudere.Data.ExternalAPI.Gelbooru;
+using Hiyakasudere.Data.ExternalAPI.Rule34;
 
 namespace Hiyakasudere;
 
@@ -37,6 +38,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IPostTranslationService, PostTranslationService>();
         builder.Services.AddSingleton<IKonachanPostService, KonachanPostService>();
         builder.Services.AddSingleton<IGelbooruPostService, GelbooruPostService>();
+        builder.Services.AddSingleton<IRule34PostService, Rule34PostService>();
         builder.Services.AddSingleton<IAppConfigService, AppConfigService>();
         builder.Services.AddSingleton<IImageNetUtils, ImageNetUtils>();
         

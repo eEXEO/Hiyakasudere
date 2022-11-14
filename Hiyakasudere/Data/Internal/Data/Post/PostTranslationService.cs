@@ -8,6 +8,7 @@ using Microsoft.Maui.Controls;
 using System.Globalization;
 using Hiyakasudere.Data.ExternalAPI.Konachan;
 using Hiyakasudere.Data.ExternalAPI.Gelbooru;
+using Hiyakasudere.Data.ExternalAPI.Rule34;
 
 namespace Hiyakasudere.Data.Internal.Data.Post
 {
@@ -18,18 +19,21 @@ namespace Hiyakasudere.Data.Internal.Data.Post
         readonly private ISafebooruPostService _safebooruPostService;
         readonly private IKonachanPostService _konachanPostService;
         readonly private IGelbooruPostService _gelbooruPostService;
+        readonly private IRule34PostService _rule34PostService;
 
         private List<TagInternal> tags = new();
 
 
         public PostTranslationService(IAppConfigService appConfigService, IYanderePostService yanderePostService, 
-            ISafebooruPostService safebooruPostService, IKonachanPostService konachanPostService, IGelbooruPostService gelbooruPostService)
+            ISafebooruPostService safebooruPostService, IKonachanPostService konachanPostService, IGelbooruPostService gelbooruPostService, 
+            IRule34PostService rule34PostService)
         {
             _appConfigService = appConfigService;
             _yanderePostService = yanderePostService;
             _safebooruPostService = safebooruPostService;
             _konachanPostService = konachanPostService;
             _gelbooruPostService = gelbooruPostService;
+            _rule34PostService = rule34PostService;
         }
 
         protected List<string> GetSimplefiedTags()
@@ -72,9 +76,12 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                 case 4:
                     count = await _gelbooruPostService.GetGelbooruPostCount(GetSimplefiedTags());
                     break;
+                case 5:
+                    count = await _rule34PostService.GetRule34PostCount(GetSimplefiedTags());
+                    break;
             }
 
-            return count / _appConfigService.PostsPerPage;
+            return (int)Math.Ceiling((double)count / _appConfigService.PostsPerPage);
         }
 
         public void UpdateTags(List<TagInternal> tags)
@@ -99,6 +106,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
             IEnumerable<SafebooruPost> safebooruPosts = null;
             IEnumerable<KonachanPost> konachanPosts = null;
             IEnumerable<GelbooruPost> gelbooruPosts = null;
+            IEnumerable<Rule34Post> rule34Posts = null;
 
             //temp vars
             DateTime loDate = new DateTime();
@@ -318,6 +326,74 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 
                     posts = temp.AsEnumerable<PostInternal>();
                     break;
+                case 5:
+                    //Rule34
+                    rule34Posts = await _rule34PostService.GetRule34Data(_rule34PostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
+
+                    foreach (Rule34Post element in rule34Posts)
+                    {
+                        //(first letter from - safe, questionable, explict)
+                        if (_appConfigService.IsNSFW is false && element.Rating.Equals("e") || _appConfigService.IsNSFW is false && element.Rating.Equals("q")) continue;
+
+                        //Translate rating value
+                        if (element.Rating.Equals("e"))
+                        {
+                            element.Rating = "Explict";
+                        }
+                        else if (element.Rating.Equals("q"))
+                        {
+                            element.Rating = "Questionable";
+                        }
+                        else if (element.Rating.Equals("s"))
+                        {
+                            element.Rating = "Safe";
+                        }
+
+                        source = null;
+                        try
+                        {
+                            Uri.TryCreate(element.Source, UriKind.RelativeOrAbsolute, out source);
+                            loId = element.Id;
+                            loScore = element.Score;
+                            loSaWidth = element.SampleWidth;
+                            loSaHeight = element.SampleHeight;
+                            loPrWidth = element.PreviewWidth;
+                            loPrHeight = element.PreviewHeight;
+                            loWidth = element.Width;
+                            loHeight = element.Height;
+                            loHasChildren = element.HasChildren;
+
+                            //Translate rating value
+                            if (element.Rating.Equals("q"))
+                            {
+                                element.Rating = "General";
+                            }
+                            else if (element.Rating.Equals("s"))
+                            {
+                                element.Rating = "Safe";
+                            }
+
+                            //Parse date
+                            element.CreatedAt = element.CreatedAt.Insert(element.CreatedAt.IndexOf("+") + 3, ":");
+                            loDate = DateTime.ParseExact(element.CreatedAt, "ddd MMM dd H:mm:ss zzz yyyy", CultureInfo.GetCultureInfo("en-US"));
+
+                        }
+                        catch (Exception e)
+                        {
+                            System.Diagnostics.Debug.WriteLine(e);
+                            System.Diagnostics.Debug.WriteLine("Everything is fine!");
+                        }
+
+                        temp.Add(new PostInternal(loId, element.Tags, loDate, element.CreatorId.ToString(), source,
+                            loScore, new Uri(element.PreviewUrl), loPrWidth, loPrHeight, new Uri(element.SampleUrl),
+                            loSaWidth, loSaHeight, new Uri(element.FileUrl), loWidth, loHeight, 0f,
+                            element.Rating, loHasChildren));
+                    }
+
+                    posts = temp.AsEnumerable<PostInternal>();
+                    break;
+
+
                 default:
                     break;
             }
