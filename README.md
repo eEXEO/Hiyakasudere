@@ -9,7 +9,7 @@ As mentioned above, it is new booru client. List of supported services is presen
 - [Safebooru](https://safebooru.org/)
 - [Kona-chan](https://konachan.com/)
 - [Gelbooru](https://gelbooru.com/) (WIP)
-- Rule34(https://rule34.xxx) (WIP) 
+- [Rule34](https://rule34.xxx) (WIP) 
 
 ## Tech
 
