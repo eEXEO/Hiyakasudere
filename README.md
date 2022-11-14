@@ -16,6 +16,7 @@ As mentioned above, it is new booru client. List of supported services is presen
 Hiyakasudere uses following technologies:
 
 - .NET MAUI - "cross-platform" framework for creating apps
+- Bootstrap 5 - framework for building responsive websites
 
 **Language:** C# + .NET Core 6
 
