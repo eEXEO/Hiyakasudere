@@ -71,19 +71,25 @@ public class YanderePostService : IYanderePostService
 
     public async Task<IEnumerable<YandereTag>> GetTagsAutocompletion(string partialTag)
     {
-        IEnumerable<YandereTag> results = null;
+        IEnumerable<YandereTag> results = new List<YandereTag>();
 
         try
         {
             var req = "https://yande.re/tag.json?limit=10&name=" + partialTag;
 
-            var response = await client.GetAsync(req);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var content = await response.Content.ReadAsStringAsync();
+                var response = await client.GetAsync(req);
 
-                results = JsonConvert.DeserializeObject<IEnumerable<YandereTag>>(content);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    results = JsonConvert.DeserializeObject<IEnumerable<YandereTag>>(content);
+                }
+            } catch (HttpRequestException e)
+            {
+                Debug.WriteLine(e.Message);
             }
         }
         catch (Exception e)

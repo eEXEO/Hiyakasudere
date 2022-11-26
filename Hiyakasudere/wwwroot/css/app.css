@@ -67,6 +67,7 @@ a, .btn-link {
     display: none;
 }
 
+
 @supports (-webkit-touch-callout: none) {
     .status-bar-safe-area {
         display: flex;

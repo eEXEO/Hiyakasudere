@@ -68,7 +68,7 @@
         <nav>
             <ul class="pagination">
                 <li class="page-item"><a class="page-link" @onclick="PrevPage">Previous</a></li>
-                <li class="page-item"><a class="page-link">@currentPage</a></li>
+                <li class="page-item" style="pointer-events: none;"><a class="page-link" style="font-weight: bold;">@currentPage</a></li>
                 <li class="page-item"><a class="page-link" @onclick="NextPage">Next</a></li>
             </ul>
         </nav>

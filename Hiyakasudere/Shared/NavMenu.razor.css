@@ -2,7 +2,16 @@
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.top-row {
+    .sidebarmenu > ul > li > a:hover,
+    .sidebarmenu > ul > li > span:hover {
+        color: white;
+        background-color: #dc3545;
+        border-color: #ddd;
+    }
+
+
+
+/*.top-row {
     height: 3.5rem;
     background-color: rgba(0,0,0,0.4);
 }
@@ -48,7 +57,7 @@
 .nav-item ::deep a:hover {
     background-color: rgba(255,255,255,0.1);
     color: white;
-}
+}*/
 
 @media (min-width: 641px) {
     .navbar-toggler {
