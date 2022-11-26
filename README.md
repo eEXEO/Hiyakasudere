@@ -3,13 +3,15 @@
 
 As mentioned above, it is new booru client. List of supported services is presented below and will be extending in near future. For now only Windows 10 and newer are supported, next will be macOS and maybe Android. Sadly Linux OSes are out of question for now, because MAUI framework is not supported on these systems.
 
+**This bransh is focused only on converting main app to be compliant with Microsoft Store**
+
 ## Supported services
 
 - [Yande.re](https://yande.re/)
 - [Safebooru](https://safebooru.org/)
 - [Kona-chan](https://konachan.com/)
 - [Gelbooru](https://gelbooru.com/) (WIP)
-- [Rule34](https://rule34.xxx) (WIP) 
+- [Rule34](https://rule34.xxx) (Removed due to MS Store policy) 
 
 ## Tech
 
