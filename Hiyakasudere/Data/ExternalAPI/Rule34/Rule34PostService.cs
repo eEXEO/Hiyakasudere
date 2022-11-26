@@ -34,7 +34,7 @@ namespace Hiyakasudere.Data.ExternalAPI.Rule34
             string requestUri = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index";
             requestUri += $"&limit={postsPerPage}";
             requestUri += $"&pid={currentPage}";
-            requestUri += "&tags=";
+            requestUri += "&tags=rating:s+";
 
             if (tags.Any())
             {
@@ -59,7 +59,7 @@ namespace Hiyakasudere.Data.ExternalAPI.Rule34
         {
             int rule34PostCount = 0;
 
-            var req = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=0&tags=";
+            var req = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=0&tags=rating:s+";
 
             if (tags.Any())
             {

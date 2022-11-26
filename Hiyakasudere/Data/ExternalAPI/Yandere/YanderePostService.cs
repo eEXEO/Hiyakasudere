@@ -48,7 +48,7 @@ public class YanderePostService : IYanderePostService
         string requestUri = "https://yande.re/post.json";
         requestUri += $"?limit={postsPerPage}";
         requestUri += $"&page={currentPage}";
-        requestUri += "&tags=";
+        requestUri += "&tags=rating:s+";
 
         if(tags.Any())
         {
@@ -107,7 +107,7 @@ public class YanderePostService : IYanderePostService
 
         try
         {
-            var req = "https://yande.re/post.xml?limit=1&tags=";
+            var req = "https://yande.re/post.xml?limit=1&tags=rating:s+";
 
             if (tags.Any())
             {

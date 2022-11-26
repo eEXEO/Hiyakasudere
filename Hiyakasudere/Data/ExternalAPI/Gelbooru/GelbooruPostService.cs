@@ -31,7 +31,7 @@ namespace Hiyakasudere.Data.ExternalAPI.Gelbooru
             string requestUri = "https://gelbooru.com/index.php?page=dapi&s=post&q=index";
             requestUri += $"&limit={postsPerPage}";
             requestUri += $"&pid={currentPage}";
-            requestUri += "&tags=";
+            requestUri += "&tags=rating:general+";
 
             if (tags.Any())
             {
@@ -56,7 +56,7 @@ namespace Hiyakasudere.Data.ExternalAPI.Gelbooru
         {
             int safebooruPostCount = 0;
 
-            var req = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=0&tags=";
+            var req = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=0&tags=rating:general+";
 
             if (tags.Any())
             {

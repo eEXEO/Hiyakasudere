@@ -14,12 +14,6 @@
 @if(configDataModel != null)
 {
     <EditForm Model="@configDataModel" OnValidSubmit="@HandleValidSubmit">
-        <div class="row mb-3 ">
-            <label for="nsfwCheckbox" class="col-sm-2 col-form-label col-form-label-sm">NSFW Enabler</label>
-            <div class="col-sm-10">
-                <input type="checkbox" id="nsfwCheckbox" @bind="configDataModel.NSFWEnabled"></input>
-            </div>
-        </div>
         <div class="row mb-3">
             <label for="sourceSelect" class="col-sm-2 col-form-label col-form-label-sm form">Source Select</label>
             <div class="col-sm-10">
@@ -28,7 +22,6 @@
                     <option value="2">Safebooru</option>
                     <option value="3">Kona-chan</option>
                     <option value="4">Gelbooru</option>
-                    <option value="5">Rule34</option>
                 </select>
             </div>
         </div>

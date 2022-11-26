@@ -49,7 +49,7 @@ public class KonachanPostService : IKonachanPostService
         string requestUri = "https://konachan.com/post.json";
         requestUri += $"?limit={postsPerPage}";
         requestUri += $"&page={currentPage}";
-        requestUri += "&tags=";
+        requestUri += "&tags=rating:s+";
 
         if(tags.Any())
         {
@@ -102,7 +102,7 @@ public class KonachanPostService : IKonachanPostService
 
         try
         {
-            var req = "https://yande.re/post.xml?limit=1&tags=";
+            var req = "https://yande.re/post.xml?limit=1&tags=rating:s+";
 
             if (tags.Any())
             {
