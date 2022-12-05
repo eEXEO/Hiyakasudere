@@ -28,7 +28,7 @@ namespace Hiyakasudere.Data.Internal.Config
         {
             this.fileManager = fileManager;
             
-            SelectedSource = 1;
+            SelectedSource = 2;
             PostsPerPage = 18;
             IsNSFW = false;
             ImageSavePath = "";

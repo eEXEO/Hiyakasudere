@@ -7,11 +7,11 @@ As mentioned above, it is new booru client. List of supported services is presen
 
 ## Supported services
 
-- [Yande.re](https://yande.re/)
 - [Safebooru](https://safebooru.org/)
-- [Kona-chan](https://konachan.com/)
-- [Gelbooru](https://gelbooru.com/) (WIP)
-- [Rule34](https://rule34.xxx) (Removed due to MS Store policy) 
+- Yande.re (Removed due to MS Store policy, safe content deemed unsafe) 
+- Kona-chan (Removed due to MS Store policy, safe content deemed unsafe) 
+- Gelbooru (Removed due to MS Store policy, safe content deemed unsafe) 
+- Rule34 (Removed due to MS Store policy) 
 
 ## Tech
 
