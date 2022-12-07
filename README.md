@@ -3,6 +3,9 @@
 
 As mentioned above, it is new booru client. List of supported services is presented below and will be extending in near future. For now only Windows 10 and newer are supported, next will be macOS and maybe Android. Sadly Linux OSes are out of question for now, because MAUI framework is not supported on these systems.
 
+###### Now available on
+[![Get from Microsoft Store](https://get.microsoft.com/images/en-us%20light.svg)](ms-windows-store://pdp/?productid=9MZ99G4SQ4ZD&referrer=appbadge&source=apps.microsoft.com&pos=0,0,1920,1030 "Get app")
+
 ## Supported services
 
 - [Yande.re](https://yande.re/)
