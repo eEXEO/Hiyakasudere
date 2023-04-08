@@ -32,38 +32,58 @@
 
 <hr>
 
-<div class="carousel slide carousel-dark text-center"
-     data-mdb-ride="carousel">
-    <div class="carousel-inner py-4">
-        <div class="carousel-item active">
-            <div class="container">
-                <div class="row justify-content-center">
-
-                    @if (booruPosts == null)
-                    {
-                        <div class="col-sm-2 align-self-center">
-                            <div class="spinner-grow text-danger" role="status"></div>
-                        </div>
-                    }
-                    else
-                    {
-
-                        @foreach (var post in booruPosts.Select((elem, index) => ( elem, index )))
-                        {
-                            <div class="col-sm-2 align-self-center">
-                                <div class="card" @onclick="() => ShowModal(post.index)">
-                                    <img src="@post.elem.PreviewUrl" class="card-img-top rounded" />
-                                </div>
-                            </div>
-                        }
-                    }
-                    
+<div class="row">
+    @if (booruPosts == null)
+    {
+        
+        <div class="d-flex justify-content-center flex-nowrap">
+            <div class="text-white mx-2 p-2">
+                <div class="col-sm-2 align-self-center">
+                    <div class="spinner-grow text-danger" role="status"></div>
                 </div>
             </div>
         </div>
-    </div>
+    }
+    else
+    {
+
+        int columnCount = 5;
+        int chunkSize = (int)Math.Ceiling((double)booruPosts.Count() / columnCount);
+        var chunks = booruPosts
+        .Select((value, index) => new { Index = index, Value = value })
+        .GroupBy(x => x.Index / chunkSize)
+        .Select(g => g.Select(x => x.Value));
+
+
+        <div class="row">
+            @foreach (var chunk in chunks)
+            {
+                <div class="column">
+                    @foreach (var post in chunk)
+                    {
+                        post.tempId = pictureId;
+                        <img src="@post.PreviewUrl" style="width: 100%" @onclick="() => ShowModal(post.tempId)">
+                        pictureId++;
+                    }
+                </div>
+            }
+        </div>
+        pictureId = 0;
+
+    }
 </div>
-<div class="d-flex justify-content-center flex-nowrap">
+
+<div class="fixed-bottom d-flex justify-content-center" style="z-index: 10;">
+    <nav>
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" @onclick="PrevPage">Previous</a></li>
+            <li class="page-item" style="pointer-events: none;"><a class="page-link" style="font-weight: bold;">@currentPage</a></li>
+            <li class="page-item"><a class="page-link" @onclick="NextPage">Next</a></li>
+        </ul>
+    </nav>
+</div>
+
+@*<div class="d-flex justify-content-center flex-nowrap">
     <div class="text-white mx-2 p-2">
         <nav>
             <ul class="pagination">
@@ -73,7 +93,7 @@
             </ul>
         </nav>
     </div>
- </div>
+ </div>*@
 
 
 @code {
@@ -84,6 +104,7 @@
     private int currentPage = 1;
     private int availablePages = 1;
     private string currentTags = "";
+    private int pictureId = 0;
 
     protected override async Task OnInitializedAsync()
     {
