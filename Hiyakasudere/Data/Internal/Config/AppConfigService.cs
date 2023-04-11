@@ -28,13 +28,9 @@ namespace Hiyakasudere.Data.Internal.Config
         {
             this.fileManager = fileManager;
             
-<<<<<<< HEAD
-            SelectedSource = 2;
-            PostsPerPage = 18;
-=======
+
             SelectedSource = 1;
             PostsPerPage = 15;
->>>>>>> master
             IsNSFW = false;
             ImageSavePath = "";
             BlackListedTags = new();
