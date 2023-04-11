@@ -9,7 +9,7 @@ As mentioned above, it is new booru client. List of supported services is presen
 
 - [Safebooru](https://safebooru.org/)
 - Yande.re (Removed due to MS Store policy, safe content deemed unsafe) 
-- Kona-chan (Removed due to MS Store policy, safe content deemed unsafe) 
+- Kona-chan(https://konachan.com/post?tags=&tags=rating:s+) (Removed due to MS Store policy, safe content deemed unsafe - Now It Should Be OK) 
 - Gelbooru (Removed due to MS Store policy, safe content deemed unsafe) 
 - Rule34 (Removed due to MS Store policy) 
 
