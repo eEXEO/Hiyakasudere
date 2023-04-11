@@ -220,7 +220,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                         }
 
                         temp.Add(new PostInternal(loId, element.Tags, loDate, element.Creator_id, source,
-                            loScore, new Uri(element.Preview_url), loPrWidth, loPrHeight, new Uri(element.Sample_url),
+                            loScore, /*new Uri(element.Preview_url)*/ new Uri(element.Sample_url), loPrWidth, loPrHeight, new Uri(element.Sample_url),
                             loSaWidth, loSaHeight, new Uri(element.File_url), loWidth, loHeight, 0f,
                             element.Rating, loHasChildren));
                     }

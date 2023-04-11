@@ -8,7 +8,7 @@ namespace Hiyakasudere.Data.Internal.Config
         public ConfigDataModel()
         {
             SelectedSource = 1;
-            PostsPerPage = 12;
+            PostsPerPage = 15;
             NSFWEnabled = false;
             BlackListedTags = new();
         }

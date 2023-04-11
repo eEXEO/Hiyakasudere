@@ -33,6 +33,8 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 
         public long Id { get; set; }
 
+        public int tempId { get; set; }
+
         public string Tags { get; set; }
 
         public DateTime CreatedAt { get; set; }
