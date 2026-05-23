@@ -80,5 +80,6 @@ public partial class App : Application
         services.AddTransient<BrowseViewModel>();
         services.AddTransient<FavoritesViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddSingleton<ImageViewerViewModel>();
     }
 }

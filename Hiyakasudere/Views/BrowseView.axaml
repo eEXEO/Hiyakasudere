@@ -66,20 +66,26 @@
             </StackPanel>
         </Border>
 
-        <!-- Image Grid with Infinite Scroll -->
+        <!-- Masonry Image Grid with Infinite Scroll -->
         <ScrollViewer x:Name="ImageScrollViewer" ScrollChanged="ScrollViewer_ScrollChanged">
             <ItemsControl ItemsSource="{Binding Posts}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
+                        <WrapPanel Orientation="Horizontal" ItemWidth="220" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="vm:PostThumbnailViewModel">
-                        <Border Classes="image-card" Width="180" Height="180" Margin="4">
+                        <Border Classes="image-card" Width="212" Height="{Binding DisplayHeight}"
+                                Margin="4" ClipToBounds="True" Cursor="Hand">
                             <Grid>
                                 <Image asyncImageLoader:ImageLoader.Source="{Binding PreviewUrl}"
                                        Stretch="UniformToFill" />
+                                <!-- Click to open viewer -->
+                                <Button Background="Transparent" BorderThickness="0" Opacity="0"
+                                        Command="{Binding $parent[ItemsControl].((vm:BrowseViewModel)DataContext).OpenImageCommand}"
+                                        CommandParameter="{Binding}"
+                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                                 <!-- Heart overlay -->
                                 <Button Classes="heart-btn" Classes.favorited="{Binding IsFavorited}"
                                         HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4"
@@ -87,10 +93,13 @@
                                         CommandParameter="{Binding}">
                                     <TextBlock Text="{Binding HeartIcon}" FontSize="16" />
                                 </Button>
-                                <!-- Rating badge -->
-                                <Border Background="#80000000" CornerRadius="4" Padding="4,2"
+                                <!-- Score + Rating badge -->
+                                <Border Background="#CC000000" CornerRadius="4" Padding="6,3"
                                         HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
-                                    <TextBlock Text="{Binding Rating}" FontSize="9" Foreground="#ffffff" />
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Text="{Binding Rating}" FontSize="9" Foreground="#8892b0" />
+                                        <TextBlock Text="{Binding Score, StringFormat='♥ {0}'}" FontSize="9" Foreground="#e94560" />
+                                    </StackPanel>
                                 </Border>
                             </Grid>
                         </Border>

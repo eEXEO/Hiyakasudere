@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Hiyakasudere.ViewModels"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             x:Class="Hiyakasudere.Views.ImageViewerOverlay"
+             x:DataType="vm:ImageViewerViewModel"
+             IsVisible="{Binding IsOpen}"
+             KeyDown="OnKeyDown">
+
+    <Grid Background="#E6000000">
+        <!-- Close on background click -->
+        <Border PointerPressed="Background_PointerPressed" />
+
+        <!-- Image container -->
+        <DockPanel MaxWidth="1400" MaxHeight="900" Margin="40"
+                   HorizontalAlignment="Center" VerticalAlignment="Center">
+
+            <!-- Top toolbar -->
+            <Border DockPanel.Dock="Top" Background="#16213e" CornerRadius="8,8,0,0" Padding="12,8">
+                <DockPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Spacing="12">
+                        <TextBlock Text="{Binding CurrentPost.Rating}" Foreground="#8892b0" FontSize="12" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding DimensionsText}" Foreground="#8892b0" FontSize="12" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding CurrentPost.Score, StringFormat='Score: {0}'}" Foreground="#e94560" FontSize="12" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Spacing="8">
+                        <Button Classes="btn-secondary" Content="Save" Command="{Binding SaveCommand}" Padding="10,4" FontSize="12" />
+                        <Button Classes="btn-secondary" Content="&#x2715; Close" Command="{Binding CloseCommand}" Padding="10,4" FontSize="12" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- Navigation arrows + Image -->
+            <Grid>
+                <Image asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}"
+                       Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                <!-- Left arrow -->
+                <Button HorizontalAlignment="Left" VerticalAlignment="Center"
+                        Command="{Binding PrevCommand}" Opacity="0.6"
+                        Background="#80000000" Foreground="White" FontSize="24"
+                        Padding="12,20" CornerRadius="0,8,8,0" BorderThickness="0"
+                        Content="&#x25C0;" />
+
+                <!-- Right arrow -->
+                <Button HorizontalAlignment="Right" VerticalAlignment="Center"
+                        Command="{Binding NextCommand}" Opacity="0.6"
+                        Background="#80000000" Foreground="White" FontSize="24"
+                        Padding="12,20" CornerRadius="8,0,0,8" BorderThickness="0"
+                        Content="&#x25B6;" />
+            </Grid>
+        </DockPanel>
+    </Grid>
+
+</UserControl>

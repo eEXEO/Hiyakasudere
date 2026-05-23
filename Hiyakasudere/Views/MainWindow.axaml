@@ -11,9 +11,10 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="32">
 
-    <DockPanel>
-        <!-- Sidebar -->
-        <Border Classes="sidebar" DockPanel.Dock="Left">
+    <Grid>
+        <DockPanel>
+            <!-- Sidebar -->
+            <Border Classes="sidebar" DockPanel.Dock="Left">
             <StackPanel VerticalAlignment="Top" Spacing="4" Margin="0,40,0,0">
                 <!-- App Logo -->
                 <Image Source="avares://Hiyakasudere/Assets/llogo.png" Width="32" Height="32"
@@ -57,4 +58,7 @@
         </Border>
     </DockPanel>
 
+    <!-- Image Viewer Overlay (covers entire window) -->
+    <views:ImageViewerOverlay DataContext="{Binding ImageViewer}" Focusable="True" />
+    </Grid>
 </Window>

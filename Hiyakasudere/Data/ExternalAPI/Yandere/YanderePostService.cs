@@ -1,139 +1,89 @@
-﻿using Hiyakasudere.Data.Internal.Config;
+using Hiyakasudere.Data.Internal.Config;
+using Hiyakasudere.Data.Internal.Functionality;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections;
-using System.Diagnostics;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace Hiyakasudere.Data.ExternalAPI.Yandere;
 
 public class YanderePostService : IYanderePostService
 {
-    HttpClient client;
-    XDocument xDocument;
+    HttpClient client = HttpClientProvider.Client;
     IAppConfigService _appConfigService;
 
     public YanderePostService(IAppConfigService appConfigService)
     {
-        client = new HttpClient();
-        xDocument = new XDocument();
         _appConfigService = appConfigService;
     }
 
     public async Task<IEnumerable<YanderePost>> GetYandereData(string request)
     {
-        IEnumerable<YanderePost> yanderePosts = null;
-
         try
         {
             var response = await client.GetAsync(request);
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                yanderePosts = JsonConvert.DeserializeObject<IEnumerable<YanderePost>>(content);
+                return JsonConvert.DeserializeObject<IEnumerable<YanderePost>>(content);
             }
-
         }
-        catch (Exception e)
-        {
-            System.Diagnostics.Debug.WriteLine(e.Message);
-            throw;
-        }
+        catch (TaskCanceledException) { } // Timeout - silent
+        catch (HttpRequestException) { } // Network unreachable - silent
+        catch (Exception e) { System.Diagnostics.Debug.WriteLine($"[Yandere] {e.Message}"); }
 
-        return yanderePosts;
+        return null;
     }
+
     public string GenerateRequestURL(int postsPerPage, int currentPage, List<string> tags, List<string> blackTags)
     {
-        string requestUri = "https://yande.re/post.json";
-        requestUri += $"?limit={postsPerPage}";
-        requestUri += $"&page={currentPage}";
-        requestUri += "&tags=";
+        string requestUri = $"https://yande.re/post.json?limit={postsPerPage}&page={currentPage}&tags=";
 
-        if(tags.Any())
-        {
-            foreach(var tag in tags)
-            {
-                requestUri += tag.ToString()+" ";
-            }
-        }
+        foreach (var tag in tags.Where(t => !string.IsNullOrEmpty(t)))
+            requestUri += tag + " ";
 
-        if (blackTags.Any())
-        {
-            foreach (var tag in blackTags)
-            {
-                requestUri += "-" + tag.ToString() + "+";
-            }
-        }
+        foreach (var tag in blackTags.Where(t => !string.IsNullOrEmpty(t)))
+            requestUri += "-" + tag + "+";
 
         return requestUri;
     }
 
     public async Task<IEnumerable<YandereTag>> GetTagsAutocompletion(string partialTag)
     {
-        IEnumerable<YandereTag> results = new List<YandereTag>();
-
         try
         {
-            var req = "https://yande.re/tag.json?limit=10&name=" + partialTag;
-
-            try
-            {
-                var response = await client.GetAsync(req);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-
-                    results = JsonConvert.DeserializeObject<IEnumerable<YandereTag>>(content);
-                }
-            } catch (HttpRequestException e)
-            {
-                Debug.WriteLine(e.Message);
-            }
-        }
-        catch (Exception e)
-        {
-            System.Diagnostics.Debug.WriteLine(e.Message);
-            throw;
-        }
-
-        return results;
-    }
-
-        public async Task<int> GetYanderePostCount(List<string> tags)
-    {
-        int yanderePostCount = 0;
-
-        try
-        {
-            var req = "https://yande.re/post.xml?limit=1&tags=";
-
-            if (tags.Any())
-            {
-                foreach (var tag in tags)
-                {
-                    req += tag.ToString() + " ";
-                }
-            }
-
-            var response = await client.GetAsync(req);
-
+            var response = await client.GetAsync($"https://yande.re/tag.json?limit=10&name={partialTag}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                xDocument = XDocument.Parse(content);
-                yanderePostCount = int.Parse(xDocument.Root.Attribute("count").Value);
+                return JsonConvert.DeserializeObject<IEnumerable<YandereTag>>(content);
             }
-
         }
-        catch (Exception e)
-        {
-            System.Diagnostics.Debug.WriteLine(e.Message);
-            throw;
-        }
+        catch (TaskCanceledException) { }
+        catch (HttpRequestException) { }
+        catch (Exception e) { System.Diagnostics.Debug.WriteLine($"[Yandere Tags] {e.Message}"); }
 
-        return yanderePostCount;
+        return new List<YandereTag>();
     }
 
+    public async Task<int> GetYanderePostCount(List<string> tags)
+    {
+        try
+        {
+            var req = "https://yande.re/post.xml?limit=1&tags=";
+            foreach (var tag in tags.Where(t => !string.IsNullOrEmpty(t)))
+                req += tag + " ";
+
+            var response = await client.GetAsync(req);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var xDoc = XDocument.Parse(content);
+                return int.Parse(xDoc.Root.Attribute("count").Value);
+            }
+        }
+        catch (TaskCanceledException) { }
+        catch (HttpRequestException) { }
+        catch (Exception e) { System.Diagnostics.Debug.WriteLine($"[Yandere Count] {e.Message}"); }
+
+        return 0;
+    }
 }

@@ -26,6 +26,25 @@ public class PostThumbnailViewModel : ViewModelBase
     public long Height { get; set; }
     public int SourceId { get; set; }
 
+    /// <summary>Preview image width from API</summary>
+    public long PreviewWidth { get; set; }
+    /// <summary>Preview image height from API</summary>
+    public long PreviewHeight { get; set; }
+
+    /// <summary>Calculated display height based on fixed column width (220px) and aspect ratio</summary>
+    public double DisplayHeight
+    {
+        get
+        {
+            const double columnWidth = 220.0;
+            if (PreviewWidth > 0 && PreviewHeight > 0)
+                return columnWidth * PreviewHeight / PreviewWidth;
+            if (Width > 0 && Height > 0)
+                return columnWidth * Height / Width;
+            return columnWidth; // Square fallback
+        }
+    }
+
     public bool IsFavorited
     {
         get => _isFavorited;
@@ -93,6 +112,9 @@ public class BrowseViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> PrevPageCommand { get; }
     public ReactiveCommand<Unit, Unit> LoadNextPageCommand { get; }
     public ReactiveCommand<PostThumbnailViewModel, Unit> ToggleFavoriteCommand { get; }
+    public ReactiveCommand<PostThumbnailViewModel, Unit> OpenImageCommand { get; }
+
+    public ImageViewerViewModel ImageViewer { get; set; }
 
     public BrowseViewModel(IPostTranslationService postService, IAppConfigService appConfig,
         IFavoritesService favoritesService, ISearchHistoryService searchHistoryService)
@@ -113,6 +135,7 @@ public class BrowseViewModel : ViewModelBase
         });
         LoadNextPageCommand = ReactiveCommand.CreateFromTask(LoadNextPage);
         ToggleFavoriteCommand = ReactiveCommand.CreateFromTask<PostThumbnailViewModel>(ToggleFavorite);
+        OpenImageCommand = ReactiveCommand.Create<PostThumbnailViewModel>(OpenImage);
 
         // Initial load
         Task.Run(async () =>
@@ -169,6 +192,8 @@ public class BrowseViewModel : ViewModelBase
                     Score = post.Score,
                     Width = post.OriginalWidth,
                     Height = post.OriginalHeight,
+                    PreviewWidth = post.PreviewWidth,
+                    PreviewHeight = post.PreviewHeight,
                     SourceId = _appConfig.SelectedSource,
                     IsFavorited = await _favoritesService.IsFavorite(post.Id, _appConfig.SelectedSource)
                 };
@@ -220,6 +245,8 @@ public class BrowseViewModel : ViewModelBase
                         Score = post.Score,
                         Width = post.OriginalWidth,
                         Height = post.OriginalHeight,
+                        PreviewWidth = post.PreviewWidth,
+                        PreviewHeight = post.PreviewHeight,
                         SourceId = _appConfig.SelectedSource,
                         IsFavorited = await _favoritesService.IsFavorite(post.Id, _appConfig.SelectedSource)
                     };
@@ -272,5 +299,12 @@ public class BrowseViewModel : ViewModelBase
         RecentSearches.Clear();
         foreach (var s in searches)
             RecentSearches.Add(s.Tags);
+    }
+
+    private void OpenImage(PostThumbnailViewModel post)
+    {
+        if (ImageViewer == null) return;
+        var index = Posts.IndexOf(post);
+        ImageViewer.Open(Posts.ToList(), index >= 0 ? index : 0);
     }
 }
