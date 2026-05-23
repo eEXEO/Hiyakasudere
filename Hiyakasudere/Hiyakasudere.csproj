@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <!-- <TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks> -->
-        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net6.0-windows10.0.19041.0</TargetFrameworks>
+        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net6.0-windows10.0.19041.0</TargetFrameworks>
         <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
         <!-- <TargetFrameworks>$(TargetFrameworks);net6.0-tizen</TargetFrameworks> -->
         <OutputType>Exe</OutputType>
@@ -76,6 +76,18 @@
       <PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.10" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+
+    <!-- Exclude non-Windows platform files from compilation since only Windows is targeted -->
+    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+      <Compile Remove="Platforms\Android\**" />
+      <Compile Remove="Platforms\iOS\**" />
+      <Compile Remove="Platforms\MacCatalyst\**" />
+      <Compile Remove="Platforms\Tizen\**" />
+      <None Include="Platforms\Android\**" />
+      <None Include="Platforms\iOS\**" />
+      <None Include="Platforms\MacCatalyst\**" />
+      <None Include="Platforms\Tizen\**" />
     </ItemGroup>
 
 </Project>
