@@ -9,56 +9,108 @@
         MinWidth="800" MinHeight="600"
         WindowStartupLocation="CenterScreen"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaTitleBarHeightHint="32">
+        ExtendClientAreaTitleBarHeightHint="40"
+        ExtendClientAreaChromeHints="NoChrome"
+        SystemDecorations="Full">
 
-    <Grid>
-        <DockPanel>
-            <!-- Sidebar -->
-            <Border Classes="sidebar" DockPanel.Dock="Left">
-            <StackPanel VerticalAlignment="Top" Spacing="4" Margin="0,40,0,0">
-                <!-- App Logo -->
-                <Image Source="avares://Hiyakasudere/Assets/llogo.png" Width="32" Height="32"
-                       HorizontalAlignment="Center" Margin="0,8,0,16" />
+    <Grid RowDefinitions="40,*">
+        <!-- Custom Title Bar -->
+        <Border Grid.Row="0" Classes="title-bar" Background="#0d1b2a" IsHitTestVisible="True">
+            <Grid ColumnDefinitions="60,*,Auto">
+                <!-- Drag region (entire title bar is draggable) -->
+                <Border Grid.Column="0" Grid.ColumnSpan="2" Background="Transparent"
+                        x:Name="TitleBarDragRegion" />
 
-                <!-- Browse -->
-                <Button Classes="nav-btn" Command="{Binding NavigateBrowseCommand}">
-                    <PathIcon Data="M4 4h4v4H4V4zm6 0h4v4h-4V4zm6 0h4v4h-4V4zM4 10h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4zM4 16h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4z"
-                              Width="20" Height="20" />
-                </Button>
+                <!-- App title -->
+                <TextBlock Grid.Column="1" Text="Hiyakasudere" 
+                           Foreground="#8892b0" FontSize="12" FontWeight="SemiBold"
+                           VerticalAlignment="Center" Margin="8,0,0,0"
+                           IsHitTestVisible="False" />
 
-                <!-- Favorites -->
-                <Button Classes="nav-btn" Command="{Binding NavigateFavoritesCommand}">
-                    <PathIcon Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                              Width="20" Height="20" />
-                </Button>
-
-                <!-- Settings -->
-                <Button Classes="nav-btn" Command="{Binding NavigateSettingsCommand}">
-                    <PathIcon Data="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
-                              Width="20" Height="20" />
-                </Button>
-            </StackPanel>
+                <!-- Window control buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Stretch"
+                            HorizontalAlignment="Right">
+                    <Button Classes="title-bar-btn" x:Name="MinimizeButton" Click="MinimizeButton_Click"
+                            ToolTip.Tip="Minimize">
+                        <PathIcon Data="M4 12h16" Width="12" Height="12" />
+                    </Button>
+                    <Button Classes="title-bar-btn" x:Name="MaximizeButton" Click="MaximizeButton_Click"
+                            ToolTip.Tip="Maximize">
+                        <PathIcon Data="M4 4h16v16H4V4z" Width="12" Height="12" />
+                    </Button>
+                    <Button Classes="title-bar-btn close-btn" x:Name="CloseButton" Click="CloseButton_Click"
+                            ToolTip.Tip="Close">
+                        <PathIcon Data="M18 6L6 18M6 6l12 12" Width="12" Height="12" />
+                    </Button>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <!-- Content Area -->
-        <Border Classes="content-area">
-            <ContentControl Content="{Binding CurrentView}">
-                <ContentControl.DataTemplates>
-                    <DataTemplate DataType="vm:BrowseViewModel">
-                        <views:BrowseView />
-                    </DataTemplate>
-                    <DataTemplate DataType="vm:FavoritesViewModel">
-                        <views:FavoritesView />
-                    </DataTemplate>
-                    <DataTemplate DataType="vm:SettingsViewModel">
-                        <views:SettingsView />
-                    </DataTemplate>
-                </ContentControl.DataTemplates>
-            </ContentControl>
-        </Border>
-    </DockPanel>
+        <!-- Main content below title bar -->
+        <Grid Grid.Row="1">
+            <DockPanel>
+                <!-- Sidebar -->
+                <Border Classes="sidebar" DockPanel.Dock="Left">
+                    <StackPanel VerticalAlignment="Top" Spacing="4" Margin="0,12,0,0">
+                        <!-- App Logo -->
+                        <Image Source="avares://Hiyakasudere/Assets/llogo.png" Width="32" Height="32"
+                               HorizontalAlignment="Center" Margin="0,8,0,16" />
 
-    <!-- Image Viewer Overlay (covers entire window) -->
-    <views:ImageViewerOverlay DataContext="{Binding ImageViewer}" Focusable="True" />
+                        <!-- Browse -->
+                        <Button Classes="nav-btn"
+                                Classes.active="{Binding IsBrowseActive}"
+                                Command="{Binding NavigateBrowseCommand}">
+                            <PathIcon Data="M4 4h4v4H4V4zm6 0h4v4h-4V4zm6 0h4v4h-4V4zM4 10h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4zM4 16h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4z"
+                                      Width="20" Height="20" />
+                        </Button>
+
+                        <!-- Favorites -->
+                        <Button Classes="nav-btn"
+                                Classes.active="{Binding IsFavoritesActive}"
+                                Command="{Binding NavigateFavoritesCommand}">
+                            <PathIcon Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                      Width="20" Height="20" />
+                        </Button>
+
+                        <!-- Settings -->
+                        <Button Classes="nav-btn"
+                                Classes.active="{Binding IsSettingsActive}"
+                                Command="{Binding NavigateSettingsCommand}">
+                            <PathIcon Data="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
+                                      Width="20" Height="20" />
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- Content Area -->
+                <Border Classes="content-area">
+                    <Grid>
+                        <ContentControl Content="{Binding CurrentView}">
+                            <ContentControl.DataTemplates>
+                                <DataTemplate DataType="vm:BrowseViewModel">
+                                    <views:BrowseView />
+                                </DataTemplate>
+                                <DataTemplate DataType="vm:FavoritesViewModel">
+                                    <views:FavoritesView />
+                                </DataTemplate>
+                                <DataTemplate DataType="vm:SettingsViewModel">
+                                    <views:SettingsView />
+                                </DataTemplate>
+                            </ContentControl.DataTemplates>
+                        </ContentControl>
+
+                        <!-- Toast Notification -->
+                        <Border Classes="toast" IsVisible="{Binding IsToastVisible}"
+                                HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                                Margin="0,0,0,20">
+                            <TextBlock Text="{Binding ToastMessage}" Foreground="#ffffff" FontSize="13" />
+                        </Border>
+                    </Grid>
+                </Border>
+            </DockPanel>
+
+            <!-- Image Viewer Overlay (covers entire window) -->
+            <views:ImageViewerOverlay DataContext="{Binding ImageViewer}" Focusable="True" />
+        </Grid>
     </Grid>
 </Window>

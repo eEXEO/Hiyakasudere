@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Hiyakasudere.ViewModels"
+             xmlns:controls="using:Hiyakasudere.Controls"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              x:Class="Hiyakasudere.Views.BrowseView"
              x:DataType="vm:BrowseViewModel">
@@ -66,47 +67,77 @@
             </StackPanel>
         </Border>
 
-        <!-- Masonry Image Grid with Infinite Scroll -->
-        <ScrollViewer x:Name="ImageScrollViewer" ScrollChanged="ScrollViewer_ScrollChanged">
-            <ItemsControl ItemsSource="{Binding Posts}">
+        <!-- Main content area: skeleton or posts -->
+        <Grid>
+            <!-- Loading Skeleton (shown when loading and no posts yet) -->
+            <ItemsControl IsVisible="{Binding ShowSkeleton}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" ItemWidth="220" />
+                        <controls:MasonryPanel ColumnWidth="220" Gap="8" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="vm:PostThumbnailViewModel">
-                        <Border Classes="image-card" Width="212" Height="{Binding DisplayHeight}"
-                                Margin="4" ClipToBounds="True" Cursor="Hand">
-                            <Grid>
-                                <Image asyncImageLoader:ImageLoader.Source="{Binding PreviewUrl}"
-                                       Stretch="UniformToFill" />
-                                <!-- Click to open viewer -->
-                                <Button Background="Transparent" BorderThickness="0" Opacity="0"
-                                        Command="{Binding $parent[ItemsControl].((vm:BrowseViewModel)DataContext).OpenImageCommand}"
-                                        CommandParameter="{Binding}"
-                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-                                <!-- Heart overlay -->
-                                <Button Classes="heart-btn" Classes.favorited="{Binding IsFavorited}"
-                                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4"
-                                        Command="{Binding $parent[ItemsControl].((vm:BrowseViewModel)DataContext).ToggleFavoriteCommand}"
-                                        CommandParameter="{Binding}">
-                                    <TextBlock Text="{Binding HeartIcon}" FontSize="16" />
-                                </Button>
-                                <!-- Score + Rating badge -->
-                                <Border Background="#CC000000" CornerRadius="4" Padding="6,3"
-                                        HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <TextBlock Text="{Binding Rating}" FontSize="9" Foreground="#8892b0" />
-                                        <TextBlock Text="{Binding Score, StringFormat='♥ {0}'}" FontSize="9" Foreground="#e94560" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
+                <ItemsControl.Items>
+                    <Border Classes="skeleton-card" Height="280" />
+                    <Border Classes="skeleton-card" Height="200" />
+                    <Border Classes="skeleton-card" Height="320" />
+                    <Border Classes="skeleton-card" Height="240" />
+                    <Border Classes="skeleton-card" Height="260" />
+                    <Border Classes="skeleton-card" Height="180" />
+                    <Border Classes="skeleton-card" Height="300" />
+                    <Border Classes="skeleton-card" Height="220" />
+                    <Border Classes="skeleton-card" Height="250" />
+                    <Border Classes="skeleton-card" Height="290" />
+                    <Border Classes="skeleton-card" Height="210" />
+                    <Border Classes="skeleton-card" Height="270" />
+                </ItemsControl.Items>
             </ItemsControl>
-        </ScrollViewer>
+
+            <!-- Masonry Image Grid with Infinite Scroll -->
+            <ScrollViewer x:Name="ImageScrollViewer" ScrollChanged="ScrollViewer_ScrollChanged"
+                          IsVisible="{Binding !ShowSkeleton}">
+                <ItemsControl ItemsSource="{Binding Posts}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <controls:MasonryPanel ColumnWidth="220" Gap="8" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:PostThumbnailViewModel">
+                            <Border Classes="image-card" Height="{Binding DisplayHeight}"
+                                    ClipToBounds="True" Cursor="Hand">
+                                <Grid>
+                                    <!-- Loading placeholder for individual card -->
+                                    <Border Classes="skeleton-shimmer" />
+                                    
+                                    <Image asyncImageLoader:ImageLoader.Source="{Binding PreviewUrl}"
+                                           Stretch="UniformToFill" />
+                                    <!-- Click to open viewer -->
+                                    <Button Background="Transparent" BorderThickness="0" Opacity="0"
+                                            Command="{Binding $parent[ItemsControl].((vm:BrowseViewModel)DataContext).OpenImageCommand}"
+                                            CommandParameter="{Binding}"
+                                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                    <!-- Heart overlay -->
+                                    <Button Classes="heart-btn" Classes.favorited="{Binding IsFavorited}"
+                                            HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4"
+                                            Command="{Binding $parent[ItemsControl].((vm:BrowseViewModel)DataContext).ToggleFavoriteCommand}"
+                                            CommandParameter="{Binding}">
+                                        <TextBlock Text="{Binding HeartIcon}" FontSize="16" />
+                                    </Button>
+                                    <!-- Score + Rating badge -->
+                                    <Border Background="#CC000000" CornerRadius="4" Padding="6,3"
+                                            HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="{Binding Rating}" FontSize="9" Foreground="#8892b0" />
+                                            <TextBlock Text="{Binding Score, StringFormat='♥ {0}'}" FontSize="9" Foreground="#e94560" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
     </DockPanel>
 
 </UserControl>

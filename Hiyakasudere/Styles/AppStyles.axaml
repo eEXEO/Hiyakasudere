@@ -6,6 +6,33 @@
         <Setter Property="Background" Value="#1a1a2e" />
     </Style>
 
+    <!-- Custom Title Bar -->
+    <Style Selector="Border.title-bar">
+        <Setter Property="Height" Value="40" />
+    </Style>
+
+    <Style Selector="Button.title-bar-btn">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="#8892b0" />
+        <Setter Property="Width" Value="46" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style Selector="Button.title-bar-btn:pointerover">
+        <Setter Property="Background" Value="#1a2744" />
+        <Setter Property="Foreground" Value="#ffffff" />
+    </Style>
+
+    <Style Selector="Button.title-bar-btn.close-btn:pointerover">
+        <Setter Property="Background" Value="#e94560" />
+        <Setter Property="Foreground" Value="#ffffff" />
+    </Style>
+
     <!-- Sidebar styling -->
     <Style Selector="Border.sidebar">
         <Setter Property="Background" Value="#16213e" />
@@ -88,7 +115,6 @@
         <Setter Property="Background" Value="#16213e" />
         <Setter Property="CornerRadius" Value="8" />
         <Setter Property="ClipToBounds" Value="True" />
-        <Setter Property="Margin" Value="4" />
     </Style>
 
     <Style Selector="Border.image-card:pointerover">
@@ -151,6 +177,47 @@
     <Style Selector="Button.heart-btn.favorited">
         <Setter Property="Foreground" Value="#e94560" />
         <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <!-- Loading Skeleton Cards -->
+    <Style Selector="Border.skeleton-card">
+        <Setter Property="Background" Value="#1e2a45" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Opacity" Value="0.6" />
+    </Style>
+
+    <Style Selector="Border.skeleton-shimmer">
+        <Setter Property="Background" Value="#16213e" />
+        <Setter Property="Opacity" Value="0.4" />
+    </Style>
+
+    <!-- Toast notification -->
+    <Style Selector="Border.toast">
+        <Setter Property="Background" Value="#2d4a2d" />
+        <Setter Property="BorderBrush" Value="#4caf50" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16,10" />
+        <Setter Property="BoxShadow" Value="0 4 16 0 #40000000" />
+    </Style>
+
+    <!-- Source status indicators -->
+    <Style Selector="Border.status-dot">
+        <Setter Property="Width" Value="10" />
+        <Setter Property="Height" Value="10" />
+        <Setter Property="CornerRadius" Value="5" />
+    </Style>
+
+    <Style Selector="Border.status-online">
+        <Setter Property="Background" Value="#4caf50" />
+    </Style>
+
+    <Style Selector="Border.status-offline">
+        <Setter Property="Background" Value="#f44336" />
+    </Style>
+
+    <Style Selector="Border.status-checking">
+        <Setter Property="Background" Value="#ff9800" />
     </Style>
 
 </Styles>

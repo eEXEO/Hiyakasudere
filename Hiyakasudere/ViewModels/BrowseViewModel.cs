@@ -65,6 +65,7 @@ public class BrowseViewModel : ViewModelBase
     private int _currentPage = 1;
     private int _totalPages = 1;
     private bool _isLoading = false;
+    private bool _showSkeleton = true;
     private string _errorMessage;
     private string _statusText = "Ready";
 
@@ -93,6 +94,12 @@ public class BrowseViewModel : ViewModelBase
     {
         get => _isLoading;
         set => this.RaiseAndSetIfChanged(ref _isLoading, value);
+    }
+
+    public bool ShowSkeleton
+    {
+        get => _showSkeleton;
+        set => this.RaiseAndSetIfChanged(ref _showSkeleton, value);
     }
 
     public string ErrorMessage
@@ -166,6 +173,7 @@ public class BrowseViewModel : ViewModelBase
         IsLoading = true;
         ErrorMessage = null;
         Posts.Clear();
+        ShowSkeleton = true;
 
         try
         {
@@ -176,6 +184,7 @@ public class BrowseViewModel : ViewModelBase
             {
                 ErrorMessage = "No posts found. Try different tags.";
                 StatusText = "No results";
+                ShowSkeleton = false;
                 return;
             }
 
@@ -216,6 +225,7 @@ public class BrowseViewModel : ViewModelBase
         finally
         {
             IsLoading = false;
+            ShowSkeleton = false;
         }
     }
 

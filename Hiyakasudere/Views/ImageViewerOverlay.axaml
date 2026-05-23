@@ -12,8 +12,7 @@
         <Border PointerPressed="Background_PointerPressed" />
 
         <!-- Image container -->
-        <DockPanel MaxWidth="1400" MaxHeight="900" Margin="40"
-                   HorizontalAlignment="Center" VerticalAlignment="Center">
+        <DockPanel Margin="40" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
             <!-- Top toolbar -->
             <Border DockPanel.Dock="Top" Background="#16213e" CornerRadius="8,8,0,0" Padding="12,8">
@@ -24,10 +23,33 @@
                         <TextBlock Text="{Binding CurrentPost.Score, StringFormat='Score: {0}'}" Foreground="#e94560" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Spacing="8">
-                        <Button Classes="btn-secondary" Content="Save" Command="{Binding SaveCommand}" Padding="10,4" FontSize="12" />
-                        <Button Classes="btn-secondary" Content="&#x2715; Close" Command="{Binding CloseCommand}" Padding="10,4" FontSize="12" />
+                        <Button Classes="btn-secondary" Content="Save (S)" Command="{Binding SaveCommand}" Padding="10,4" FontSize="12" />
+                        <Button Classes="btn-secondary" Content="&#x2715; Close (Esc)" Command="{Binding CloseCommand}" Padding="10,4" FontSize="12" />
                     </StackPanel>
                 </DockPanel>
+            </Border>
+
+            <!-- Tags panel at bottom -->
+            <Border DockPanel.Dock="Bottom" Background="#16213e" CornerRadius="0,0,8,8" Padding="8,6"
+                    MaxHeight="80">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding CurrentTags}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:TagViewModel">
+                                <Border Background="{Binding Background}" CornerRadius="10"
+                                        Padding="8,3" Margin="2" Cursor="Hand">
+                                    <TextBlock Text="{Binding Name}" Foreground="{Binding Color}"
+                                               FontSize="11" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
             </Border>
 
             <!-- Navigation arrows + Image -->

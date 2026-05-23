@@ -16,6 +16,35 @@
                           Background="#0f3460" Foreground="#ffffff" CornerRadius="8" />
             </StackPanel>
 
+            <!-- Source Status Indicators -->
+            <StackPanel Spacing="8">
+                <DockPanel>
+                    <TextBlock Text="Source Status" FontWeight="SemiBold" Foreground="#ffffff"
+                               DockPanel.Dock="Left" VerticalAlignment="Center" />
+                    <Button Classes="btn-secondary" Content="Recheck" Command="{Binding CheckSourcesCommand}"
+                            DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="10,4" FontSize="11" />
+                </DockPanel>
+                <TextBlock Classes="subtitle" Text="Shows which sources are currently reachable" />
+                <Border Background="#0f3460" CornerRadius="8" Padding="12">
+                    <ItemsControl ItemsSource="{Binding SourceStatuses}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:SourceStatusViewModel">
+                                <DockPanel Margin="0,4">
+                                    <Border Width="10" Height="10" CornerRadius="5"
+                                            Background="{Binding StatusColor}"
+                                            DockPanel.Dock="Left" VerticalAlignment="Center"
+                                            Margin="0,0,10,0" />
+                                    <TextBlock Text="{Binding Name}" Foreground="#ffffff" FontSize="13"
+                                               DockPanel.Dock="Left" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding StatusText}" Foreground="#8892b0" FontSize="11"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+            </StackPanel>
+
             <!-- Posts Per Page -->
             <StackPanel Spacing="8">
                 <TextBlock Text="Posts Per Page" FontWeight="SemiBold" Foreground="#ffffff" />
@@ -34,7 +63,7 @@
             <!-- Gelbooru Credentials -->
             <StackPanel Spacing="8">
                 <TextBlock Text="Gelbooru API Credentials" FontWeight="SemiBold" Foreground="#ffffff" />
-                <TextBlock Classes="subtitle" Text="Required since 2025. Get from gelbooru.com/index.php?page=account&amp;s=options" />
+                <TextBlock Classes="subtitle" Text="Required since 2025. Get from gelbooru.com/index.php?page=account&amp;s=options" TextWrapping="Wrap" />
                 <TextBox Watermark="API Key" Text="{Binding GelbooruApiKey}" Background="#0f3460" Foreground="#ffffff" CornerRadius="8" />
                 <TextBox Watermark="User ID" Text="{Binding GelbooruUserId}" Background="#0f3460" Foreground="#ffffff" CornerRadius="8" />
             </StackPanel>
@@ -59,7 +88,7 @@
             <Border Background="#16213e" CornerRadius="8" Padding="16" Margin="0,16,0,0">
                 <StackPanel Spacing="4">
                     <TextBlock Text="Hiyakasudere" FontWeight="Bold" Foreground="#ffffff" FontSize="16" />
-                    <TextBlock Text="v2.0.0 - Avalonia Edition" Foreground="#8892b0" FontSize="12" />
+                    <TextBlock Text="v2.1.0 - Avalonia Edition" Foreground="#8892b0" FontSize="12" />
                     <TextBlock Text="Cross-platform booru image browser" Foreground="#53548a" FontSize="12" />
                     <TextBlock Text="Windows - Linux - macOS" Foreground="#533483" FontSize="11" Margin="0,4,0,0" />
                 </StackPanel>
