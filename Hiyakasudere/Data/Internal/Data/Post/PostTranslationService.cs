@@ -192,6 +192,8 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                 case 1:
                     yanderePosts = await _yanderePostService.GetYandereData(_yanderePostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
 
+                    if (yanderePosts == null) break;
+
                     loDate = new DateTime();
 
                     foreach (YanderePost element in yanderePosts)
@@ -225,33 +227,33 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                     break;
 
                 case 2:
-                    //This is visible pain
+                    //Safebooru - API returns strings for numeric fields, some may be empty
                     safebooruPosts = await _safebooruPostService.GetSafebooruData(_safebooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
                    
+                    if (safebooruPosts == null) break;
+
                     foreach (SafebooruPost element in safebooruPosts)
                     {
-                        //This source is safe for viewer, so no precautions taken
-                        //API is inconsistent FFS
                         source = null;
                         try
                         {
                             Uri.TryCreate(element.Source, UriKind.RelativeOrAbsolute, out source);
-                            loId = long.Parse(element.Id);
-                            loScore = long.Parse(element.Score);
-                            loSaWidth = long.Parse(element.Sample_width);
-                            loSaHeight = long.Parse(element.Sample_height);
-                            loPrWidth = long.Parse(element.Preview_width);
-                            loPrHeight = long.Parse(element.Preview_height);
-                            loWidth = long.Parse(element.Width);
-                            loHeight = long.Parse(element.Height);
-                            loHasChildren = bool.Parse(element.Has_children);
+                            long.TryParse(element.Id, out loId);
+                            long.TryParse(element.Score, out loScore);
+                            long.TryParse(element.Sample_width, out loSaWidth);
+                            long.TryParse(element.Sample_height, out loSaHeight);
+                            long.TryParse(element.Preview_width, out loPrWidth);
+                            long.TryParse(element.Preview_height, out loPrHeight);
+                            long.TryParse(element.Width, out loWidth);
+                            long.TryParse(element.Height, out loHeight);
+                            bool.TryParse(element.Has_children, out loHasChildren);
 
                             //Translate rating value
-                            if (element.Rating.Equals("q"))
+                            if (element.Rating != null && element.Rating.Equals("q"))
                             {
                                 element.Rating = "General";
                             }
-                            else if (element.Rating.Equals("s"))
+                            else if (element.Rating != null && element.Rating.Equals("s"))
                             {
                                 element.Rating = "Safe";
                             }
@@ -263,13 +265,17 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                         catch(Exception e)
                         {
                             System.Diagnostics.Debug.WriteLine(e);
-                            System.Diagnostics.Debug.WriteLine("Everything is fine!");
+                            continue; // Skip malformed posts
                         }
 
-                        temp.Add(new PostInternal(loId, element.Tags, loDate, element.Creator_id, source,
-                            loScore, /*new Uri(element.Preview_url)*/ new Uri(element.Sample_url), loPrWidth, loPrHeight, new Uri(element.Sample_url),
+                        // Skip posts with missing URLs
+                        if (string.IsNullOrEmpty(element.Sample_url) || string.IsNullOrEmpty(element.File_url))
+                            continue;
+
+                        temp.Add(new PostInternal(loId, element.Tags, loDate, element.Creator_id ?? "", source,
+                            loScore, new Uri(element.Sample_url), loPrWidth, loPrHeight, new Uri(element.Sample_url),
                             loSaWidth, loSaHeight, new Uri(element.File_url), loWidth, loHeight, 0f,
-                            element.Rating, loHasChildren));
+                            element.Rating ?? "Unknown", loHasChildren));
                     }
 
                     posts = temp.AsEnumerable<PostInternal>();
@@ -277,6 +283,8 @@ namespace Hiyakasudere.Data.Internal.Data.Post
 
                 case 3:
                     konachanPosts = await _konachanPostService.GetKonachanData(_konachanPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
+
+                    if (konachanPosts == null) break;
 
                     loDate = new DateTime();
 
@@ -310,15 +318,16 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                     posts = temp.AsEnumerable<PostInternal>();
                     break;
                 case 4: //gelbooru
-                    //API is inconsistent FFS
 
                     gelbooruPosts = await _gelbooruPostService.GetGelbooruData(_gelbooruPostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
 
+                    if (gelbooruPosts == null) break;
+
                     foreach (GelbooruPost element in gelbooruPosts)
                     {
-                        
-                        //API is inconsistent FFS
                         source = null;
+                        preview = null;
+                        sample = null;
                         try
                         {
                             Uri.TryCreate(element.Source, UriKind.RelativeOrAbsolute, out source);
@@ -333,11 +342,11 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                             loHasChildren = element.HasChildren;
 
                             //Translate rating value
-                            if (element.Rating.Equals("q"))
+                            if (element.Rating != null && element.Rating.Equals("q"))
                             {
                                 element.Rating = "General";
                             }
-                            else if (element.Rating.Equals("s"))
+                            else if (element.Rating != null && element.Rating.Equals("s"))
                             {
                                 element.Rating = "Safe";
                             }
@@ -348,21 +357,26 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                                 loDate = TryParseBooruDate(element.CreatedAt);
                             }
 
-
-                            Uri.TryCreate(element.SampleUrl, UriKind.RelativeOrAbsolute, out sample);
-                            Uri.TryCreate(element.PreviewUrl, UriKind.RelativeOrAbsolute, out preview);
+                            if (!string.IsNullOrEmpty(element.SampleUrl))
+                                Uri.TryCreate(element.SampleUrl, UriKind.RelativeOrAbsolute, out sample);
+                            if (!string.IsNullOrEmpty(element.PreviewUrl))
+                                Uri.TryCreate(element.PreviewUrl, UriKind.RelativeOrAbsolute, out preview);
 
                         }
                         catch (Exception e)
                         {
                             System.Diagnostics.Debug.WriteLine(e);
-                            System.Diagnostics.Debug.WriteLine("Everything is fine!");
+                            continue; // Skip malformed posts
                         }
 
-                        temp.Add(new PostInternal(loId, element.Tags, loDate, element.CreatorId.ToString(), source,
-                            loScore, preview, loPrWidth, loPrHeight, preview,
+                        // Skip posts with missing URLs
+                        if (preview == null || string.IsNullOrEmpty(element.FileUrl))
+                            continue;
+
+                        temp.Add(new PostInternal(loId, element.Tags ?? "", loDate, element.CreatorId.ToString(), source,
+                            loScore, preview, loPrWidth, loPrHeight, sample ?? preview,
                             loSaWidth, loSaHeight, new Uri(element.FileUrl), loWidth, loHeight, 0f,
-                            element.Rating, loHasChildren));
+                            element.Rating ?? "Unknown", loHasChildren));
                     }
 
                     posts = temp.AsEnumerable<PostInternal>();
@@ -371,21 +385,23 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                     //Rule34
                     rule34Posts = await _rule34PostService.GetRule34Data(_rule34PostService.GenerateRequestURL(_appConfigService.PostsPerPage, currentPage, GetSimplefiedTags(), _appConfigService.GetSimplifiedBlackTags()));
 
+                    if (rule34Posts == null) break;
+
                     foreach (Rule34Post element in rule34Posts)
                     {
                         //(first letter from - safe, questionable, explict)
-                        if (_appConfigService.IsNSFW is false && element.Rating.Equals("e") || _appConfigService.IsNSFW is false && element.Rating.Equals("q")) continue;
+                        if (_appConfigService.IsNSFW is false && element.Rating != null && element.Rating.Equals("e") || _appConfigService.IsNSFW is false && element.Rating != null && element.Rating.Equals("q")) continue;
 
                         //Translate rating value
-                        if (element.Rating.Equals("e"))
+                        if (element.Rating != null && element.Rating.Equals("e"))
                         {
-                            element.Rating = "Explict";
+                            element.Rating = "Explicit";
                         }
-                        else if (element.Rating.Equals("q"))
+                        else if (element.Rating != null && element.Rating.Equals("q"))
                         {
                             element.Rating = "Questionable";
                         }
-                        else if (element.Rating.Equals("s"))
+                        else if (element.Rating != null && element.Rating.Equals("s"))
                         {
                             element.Rating = "Safe";
                         }
@@ -404,16 +420,6 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                             loHeight = element.Height;
                             loHasChildren = element.HasChildren;
 
-                            //Translate rating value
-                            if (element.Rating.Equals("q"))
-                            {
-                                element.Rating = "General";
-                            }
-                            else if (element.Rating.Equals("s"))
-                            {
-                                element.Rating = "Safe";
-                            }
-
                             //Parse date - use robust parsing
                             if(element.CreatedAt != null)
                             {
@@ -424,13 +430,17 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                         catch (Exception e)
                         {
                             System.Diagnostics.Debug.WriteLine(e);
-                            System.Diagnostics.Debug.WriteLine("Everything is fine!");
+                            continue; // Skip malformed posts
                         }
 
-                        temp.Add(new PostInternal(loId, element.Tags, loDate, element.CreatorId.ToString(), source,
+                        // Skip posts with missing URLs
+                        if (string.IsNullOrEmpty(element.PreviewUrl) || string.IsNullOrEmpty(element.SampleUrl) || string.IsNullOrEmpty(element.FileUrl))
+                            continue;
+
+                        temp.Add(new PostInternal(loId, element.Tags ?? "", loDate, element.CreatorId.ToString(), source,
                             loScore, new Uri(element.PreviewUrl), loPrWidth, loPrHeight, new Uri(element.SampleUrl),
                             loSaWidth, loSaHeight, new Uri(element.FileUrl), loWidth, loHeight, 0f,
-                            element.Rating, loHasChildren));
+                            element.Rating ?? "Unknown", loHasChildren));
                     }
 
                     posts = temp.AsEnumerable<PostInternal>();
