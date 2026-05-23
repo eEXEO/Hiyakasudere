@@ -33,6 +33,14 @@ namespace Hiyakasudere.Data.ExternalAPI.Rule34
         {
             currentPage -= 1;
             string requestUri = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index";
+
+            // Add API credentials (required since 2025)
+            if (!string.IsNullOrEmpty(_appConfigService.Rule34ApiKey) && !string.IsNullOrEmpty(_appConfigService.Rule34UserId))
+            {
+                requestUri += $"&api_key={_appConfigService.Rule34ApiKey}";
+                requestUri += $"&user_id={_appConfigService.Rule34UserId}";
+            }
+
             requestUri += $"&limit={postsPerPage}";
             requestUri += $"&pid={currentPage}";
             requestUri += "&tags=";
@@ -60,7 +68,16 @@ namespace Hiyakasudere.Data.ExternalAPI.Rule34
         {
             int rule34PostCount = 0;
 
-            var req = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=0&tags=";
+            var req = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=0";
+
+            // Add API credentials (required since 2025)
+            if (!string.IsNullOrEmpty(_appConfigService.Rule34ApiKey) && !string.IsNullOrEmpty(_appConfigService.Rule34UserId))
+            {
+                req += $"&api_key={_appConfigService.Rule34ApiKey}";
+                req += $"&user_id={_appConfigService.Rule34UserId}";
+            }
+
+            req += "&tags=";
 
             if (tags.Any())
             {
@@ -97,6 +114,13 @@ namespace Hiyakasudere.Data.ExternalAPI.Rule34
             try
             {
                 var req = $"https://api.rule34.xxx/index.php?page=dapi&s=tag&q=index&limit=10&name_pattern=%25{partialTag}%25";
+
+                // Add API credentials (required since 2025)
+                if (!string.IsNullOrEmpty(_appConfigService.Rule34ApiKey) && !string.IsNullOrEmpty(_appConfigService.Rule34UserId))
+                {
+                    req += $"&api_key={_appConfigService.Rule34ApiKey}";
+                    req += $"&user_id={_appConfigService.Rule34UserId}";
+                }
 
                 var response = await client.GetAsync(req);
                 if (response.IsSuccessStatusCode)

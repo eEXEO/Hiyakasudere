@@ -21,6 +21,10 @@ namespace Hiyakasudere.Data.Internal.Config
         public int PostsPerPage { get; set; } = 18;
         public bool IsNSFW { get; set; } = false;
         public string ImageSavePath { get; set; } = "";
+        public string GelbooruApiKey { get; set; } = "";
+        public string GelbooruUserId { get; set; } = "";
+        public string Rule34ApiKey { get; set; } = "";
+        public string Rule34UserId { get; set; } = "";
         public List<TagInternal> BlackListedTags;
         #endregion
 
@@ -64,6 +68,10 @@ namespace Hiyakasudere.Data.Internal.Config
                 {
                     var fromFile = await fileManager.ReadConfigFile();
                     UpdateConfig(fromFile.SelectedSource, fromFile.PostsPerPage, fromFile.NSFWEnabled, fromFile.BlackListedTags);
+                    GelbooruApiKey = fromFile.GelbooruApiKey ?? "";
+                    GelbooruUserId = fromFile.GelbooruUserId ?? "";
+                    Rule34ApiKey = fromFile.Rule34ApiKey ?? "";
+                    Rule34UserId = fromFile.Rule34UserId ?? "";
                 }
                 else
                 {
@@ -86,7 +94,12 @@ namespace Hiyakasudere.Data.Internal.Config
 
         public ConfigDataModel GetCurrentConfiguration()
         {
-            return new ConfigDataModel(SelectedSource, PostsPerPage, IsNSFW, BlackListedTags);
+            var config = new ConfigDataModel(SelectedSource, PostsPerPage, IsNSFW, BlackListedTags);
+            config.GelbooruApiKey = GelbooruApiKey;
+            config.GelbooruUserId = GelbooruUserId;
+            config.Rule34ApiKey = Rule34ApiKey;
+            config.Rule34UserId = Rule34UserId;
+            return config;
         }
 
         public bool UpdateConfig(int SelectedSource, int PostsPerPage, bool IsNSFW, List<TagInternal> BlackListedTags)

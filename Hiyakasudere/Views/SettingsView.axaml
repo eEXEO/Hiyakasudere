@@ -31,6 +31,22 @@
                 <ToggleSwitch IsChecked="{Binding NsfwEnabled}" OnContent="NSFW Enabled" OffContent="Safe Only" />
             </StackPanel>
 
+            <!-- Gelbooru Credentials -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Gelbooru API Credentials" FontWeight="SemiBold" Foreground="#ffffff" />
+                <TextBlock Classes="subtitle" Text="Required since 2025. Get from gelbooru.com/index.php?page=account&amp;s=options" />
+                <TextBox Watermark="API Key" Text="{Binding GelbooruApiKey}" Background="#0f3460" Foreground="#ffffff" CornerRadius="8" />
+                <TextBox Watermark="User ID" Text="{Binding GelbooruUserId}" Background="#0f3460" Foreground="#ffffff" CornerRadius="8" />
+            </StackPanel>
+
+            <!-- Rule34 Credentials -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Rule34 API Credentials" FontWeight="SemiBold" Foreground="#ffffff" />
+                <TextBlock Classes="subtitle" Text="Required since 2025. Get from rule34.xxx account settings" />
+                <TextBox Watermark="API Key" Text="{Binding Rule34ApiKey}" Background="#0f3460" Foreground="#ffffff" CornerRadius="8" />
+                <TextBox Watermark="User ID" Text="{Binding Rule34UserId}" Background="#0f3460" Foreground="#ffffff" CornerRadius="8" />
+            </StackPanel>
+
             <!-- Save Button -->
             <Button Classes="btn-primary" Content="Save Settings" Command="{Binding SaveCommand}"
                     HorizontalAlignment="Left" Margin="0,8,0,0" />

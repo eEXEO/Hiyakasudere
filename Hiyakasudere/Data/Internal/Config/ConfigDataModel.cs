@@ -11,6 +11,10 @@ namespace Hiyakasudere.Data.Internal.Config
             PostsPerPage = 15;
             NSFWEnabled = false;
             BlackListedTags = new();
+            GelbooruApiKey = "";
+            GelbooruUserId = "";
+            Rule34ApiKey = "";
+            Rule34UserId = "";
         }
         public ConfigDataModel(int selectedSource, int postsPerPage, bool nSFWEnabled, List<TagInternal> blackListedTags)
         {
@@ -18,6 +22,10 @@ namespace Hiyakasudere.Data.Internal.Config
             PostsPerPage = postsPerPage;
             NSFWEnabled = nSFWEnabled;
             BlackListedTags = blackListedTags;
+            GelbooruApiKey = "";
+            GelbooruUserId = "";
+            Rule34ApiKey = "";
+            Rule34UserId = "";
         }
 
         [Required]
@@ -34,7 +42,18 @@ namespace Hiyakasudere.Data.Internal.Config
         public bool NSFWEnabled { get; set; }
 
         [Required]
-        public List<TagInternal> BlackListedTags { get; set; } 
+        public List<TagInternal> BlackListedTags { get; set; }
 
+        /// <summary>Gelbooru API key (get from gelbooru.com account settings)</summary>
+        public string GelbooruApiKey { get; set; }
+
+        /// <summary>Gelbooru User ID (get from gelbooru.com account settings)</summary>
+        public string GelbooruUserId { get; set; }
+
+        /// <summary>Rule34 API key (get from rule34.xxx account)</summary>
+        public string Rule34ApiKey { get; set; }
+
+        /// <summary>Rule34 User ID (get from rule34.xxx account)</summary>
+        public string Rule34UserId { get; set; }
     }
 }

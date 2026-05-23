@@ -16,12 +16,11 @@
         <Border Classes="sidebar" DockPanel.Dock="Left">
             <StackPanel VerticalAlignment="Top" Spacing="4" Margin="0,40,0,0">
                 <!-- App Logo -->
-                <TextBlock Text="H" FontSize="24" FontWeight="Bold" Foreground="#e94560"
-                           HorizontalAlignment="Center" Margin="0,8,0,16" />
+                <Image Source="avares://Hiyakasudere/Assets/llogo.png" Width="32" Height="32"
+                       HorizontalAlignment="Center" Margin="0,8,0,16" />
 
                 <!-- Browse -->
-                <Button Classes="nav-btn" Command="{Binding NavigateBrowseCommand}"
-                        Classes.active="{Binding ActiveNav, Converter={x:Static StringConverters.IsNotNullOrEmpty}, ConverterParameter=browse}">
+                <Button Classes="nav-btn" Command="{Binding NavigateBrowseCommand}">
                     <PathIcon Data="M4 4h4v4H4V4zm6 0h4v4h-4V4zm6 0h4v4h-4V4zM4 10h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4zM4 16h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4z"
                               Width="20" Height="20" />
                 </Button>

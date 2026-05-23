@@ -11,11 +11,12 @@
             <Button Classes="btn-primary" DockPanel.Dock="Right" Margin="8,0,0,0"
                     Command="{Binding SearchCommand}" Content="Search" />
             <TextBox Classes="search-box" Text="{Binding SearchText}"
-                     Watermark="Enter tags separated by spaces..." />
+                     Watermark="Enter tags separated by spaces..."
+                     KeyDown="SearchBox_KeyDown" />
         </DockPanel>
 
         <!-- Recent Searches -->
-        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding RecentSearches}" Margin="0,0,0,12"
+        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding RecentSearches}" Margin="0,0,0,8"
                       IsVisible="{Binding RecentSearches.Count}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -24,40 +25,49 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Classes="tag-chip">
+                    <Border Classes="tag-chip" Cursor="Hand">
                         <TextBlock Text="{Binding}" FontSize="11" Foreground="#8892b0" />
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <!-- Pagination -->
-        <DockPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
-                <Button Classes="page-btn" Command="{Binding PrevPageCommand}" Content="&lt;" />
-                <TextBlock VerticalAlignment="Center" Foreground="#ffffff" Margin="8,0">
-                    <Run Text="{Binding CurrentPage}" />
-                    <Run Text=" / " />
-                    <Run Text="{Binding TotalPages}" />
-                </TextBlock>
-                <Button Classes="page-btn" Command="{Binding NextPageCommand}" Content="&gt;" />
-            </StackPanel>
-            <TextBlock Text="{Binding StatusText}" Foreground="#8892b0" FontSize="12"
-                       VerticalAlignment="Center" HorizontalAlignment="Right" />
-        </DockPanel>
-
-        <!-- Loading -->
+        <!-- Loading bar -->
         <ProgressBar DockPanel.Dock="Top" IsIndeterminate="True" IsVisible="{Binding IsLoading}"
-                     Foreground="#e94560" Height="3" Margin="0,0,0,8" />
+                     Foreground="#e94560" Height="3" Margin="0,0,0,4" />
+
+        <!-- Status bar -->
+        <Border DockPanel.Dock="Bottom" Padding="8,6" Background="#16213e" CornerRadius="6,6,0,0">
+            <DockPanel>
+                <TextBlock Text="{Binding StatusText}" Foreground="#8892b0" FontSize="12"
+                           VerticalAlignment="Center" DockPanel.Dock="Left" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4"
+                            VerticalAlignment="Center">
+                    <Button Classes="page-btn" Command="{Binding PrevPageCommand}" Content="&#x25C0;"
+                            FontSize="10" Padding="8,4" />
+                    <TextBlock VerticalAlignment="Center" Foreground="#ffffff" FontSize="12" Margin="4,0">
+                        <Run Text="{Binding CurrentPage}" />
+                        <Run Text="/" />
+                        <Run Text="{Binding TotalPages}" />
+                    </TextBlock>
+                    <Button Classes="page-btn" Command="{Binding NextPageCommand}" Content="&#x25B6;"
+                            FontSize="10" Padding="8,4" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
 
         <!-- Error -->
         <Border DockPanel.Dock="Top" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                 Background="#2d1b1b" CornerRadius="8" Padding="16" Margin="0,0,0,8">
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="#e94560" TextWrapping="Wrap" />
+            <StackPanel Spacing="8">
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="#e94560" TextWrapping="Wrap" />
+                <Button Classes="btn-secondary" Content="Retry" Command="{Binding SearchCommand}"
+                        HorizontalAlignment="Left" />
+            </StackPanel>
         </Border>
 
-        <!-- Image Grid -->
-        <ScrollViewer>
+        <!-- Image Grid with Infinite Scroll -->
+        <ScrollViewer x:Name="ImageScrollViewer" ScrollChanged="ScrollViewer_ScrollChanged">
             <ItemsControl ItemsSource="{Binding Posts}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -66,7 +76,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="vm:PostThumbnailViewModel">
-                        <Border Classes="image-card" Width="200" Height="200">
+                        <Border Classes="image-card" Width="180" Height="180" Margin="4">
                             <Grid>
                                 <Image asyncImageLoader:ImageLoader.Source="{Binding PreviewUrl}"
                                        Stretch="UniformToFill" />
@@ -75,12 +85,12 @@
                                         HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4"
                                         Command="{Binding $parent[ItemsControl].((vm:BrowseViewModel)DataContext).ToggleFavoriteCommand}"
                                         CommandParameter="{Binding}">
-                                    <TextBlock Text="{Binding HeartIcon}" FontSize="18" />
+                                    <TextBlock Text="{Binding HeartIcon}" FontSize="16" />
                                 </Button>
                                 <!-- Rating badge -->
                                 <Border Background="#80000000" CornerRadius="4" Padding="4,2"
                                         HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
-                                    <TextBlock Text="{Binding Rating}" FontSize="10" Foreground="#ffffff" />
+                                    <TextBlock Text="{Binding Rating}" FontSize="9" Foreground="#ffffff" />
                                 </Border>
                             </Grid>
                         </Border>

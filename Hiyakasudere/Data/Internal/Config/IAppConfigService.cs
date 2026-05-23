@@ -16,6 +16,10 @@ namespace Hiyakasudere.Data.Internal.Config
         int PostsPerPage { get; set; }
         bool IsNSFW { get; set; }
         string ImageSavePath { get; set; }
+        string GelbooruApiKey { get; set; }
+        string GelbooruUserId { get; set; }
+        string Rule34ApiKey { get; set; }
+        string Rule34UserId { get; set; }
         bool UpdateConfig(int SelectedSource, int PostsPerPage, bool IsNSFW, List<TagInternal> BlaclistedTags);
     }
 }

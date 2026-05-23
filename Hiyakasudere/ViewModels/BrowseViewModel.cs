@@ -91,6 +91,7 @@ public class BrowseViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> SearchCommand { get; }
     public ReactiveCommand<Unit, Unit> NextPageCommand { get; }
     public ReactiveCommand<Unit, Unit> PrevPageCommand { get; }
+    public ReactiveCommand<Unit, Unit> LoadNextPageCommand { get; }
     public ReactiveCommand<PostThumbnailViewModel, Unit> ToggleFavoriteCommand { get; }
 
     public BrowseViewModel(IPostTranslationService postService, IAppConfigService appConfig,
@@ -108,7 +109,9 @@ public class BrowseViewModel : ViewModelBase
         });
         PrevPageCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            if (CurrentPage > 1) { CurrentPage--; await LoadPage(); }
+            if (CurrentPage > 1) { CurrentPage--; Posts.Clear(); await LoadPage(); }
+        });
+        LoadNextPageCommand = ReactiveCommand.CreateFromTask(LoadNextPage);
         });
         ToggleFavoriteCommand = ReactiveCommand.CreateFromTask<PostThumbnailViewModel>(ToggleFavorite);
 
@@ -184,6 +187,52 @@ public class BrowseViewModel : ViewModelBase
         {
             ErrorMessage = "Failed to load posts. Please try again.";
             StatusText = "Error";
+            System.Diagnostics.Debug.WriteLine(ex);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task LoadNextPage()
+    {
+        if (IsLoading || CurrentPage >= TotalPages) return;
+
+        CurrentPage++;
+        IsLoading = true;
+
+        try
+        {
+            var posts = await _postService.GetPostData(CurrentPage);
+
+            if (posts != null && posts.Any())
+            {
+                foreach (var post in posts)
+                {
+                    var vm = new PostThumbnailViewModel
+                    {
+                        Id = post.Id,
+                        PreviewUrl = post.PreviewUrl?.AbsoluteUri ?? "",
+                        SampleUrl = post.SampleUrl?.AbsoluteUri ?? "",
+                        OriginalUrl = post.OriginalUrl?.AbsoluteUri ?? "",
+                        Tags = post.Tags ?? "",
+                        Rating = post.Rating ?? "",
+                        Score = post.Score,
+                        Width = post.OriginalWidth,
+                        Height = post.OriginalHeight,
+                        SourceId = _appConfig.SelectedSource,
+                        IsFavorited = await _favoritesService.IsFavorite(post.Id, _appConfig.SelectedSource)
+                    };
+                    Posts.Add(vm);
+                }
+            }
+
+            StatusText = $"Page {CurrentPage}/{TotalPages} - {Posts.Count} posts loaded";
+        }
+        catch (Exception ex)
+        {
+            CurrentPage--; // Revert on failure
             System.Diagnostics.Debug.WriteLine(ex);
         }
         finally

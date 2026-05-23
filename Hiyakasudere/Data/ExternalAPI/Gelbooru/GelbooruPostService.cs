@@ -30,6 +30,14 @@ namespace Hiyakasudere.Data.ExternalAPI.Gelbooru
         {
             currentPage -= 1;
             string requestUri = "https://gelbooru.com/index.php?page=dapi&s=post&q=index";
+
+            // Add API credentials (required since 2025)
+            if (!string.IsNullOrEmpty(_appConfigService.GelbooruApiKey) && !string.IsNullOrEmpty(_appConfigService.GelbooruUserId))
+            {
+                requestUri += $"&api_key={_appConfigService.GelbooruApiKey}";
+                requestUri += $"&user_id={_appConfigService.GelbooruUserId}";
+            }
+
             requestUri += $"&limit={postsPerPage}";
             requestUri += $"&pid={currentPage}";
             requestUri += "&tags=";
@@ -57,7 +65,16 @@ namespace Hiyakasudere.Data.ExternalAPI.Gelbooru
         {
             int gelbooruPostCount = 0;
 
-            var req = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=0&tags=";
+            var req = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=0";
+
+            // Add API credentials (required since 2025)
+            if (!string.IsNullOrEmpty(_appConfigService.GelbooruApiKey) && !string.IsNullOrEmpty(_appConfigService.GelbooruUserId))
+            {
+                req += $"&api_key={_appConfigService.GelbooruApiKey}";
+                req += $"&user_id={_appConfigService.GelbooruUserId}";
+            }
+
+            req += "&tags=";
 
             if (tags.Any())
             {
@@ -94,6 +111,13 @@ namespace Hiyakasudere.Data.ExternalAPI.Gelbooru
             try
             {
                 var req = $"https://gelbooru.com/index.php?page=dapi&s=tag&q=index&limit=10&name_pattern=%25{partialTag}%25";
+
+                // Add API credentials (required since 2025)
+                if (!string.IsNullOrEmpty(_appConfigService.GelbooruApiKey) && !string.IsNullOrEmpty(_appConfigService.GelbooruUserId))
+                {
+                    req += $"&api_key={_appConfigService.GelbooruApiKey}";
+                    req += $"&user_id={_appConfigService.GelbooruUserId}";
+                }
 
                 var response = await client.GetAsync(req);
                 if (response.IsSuccessStatusCode)
