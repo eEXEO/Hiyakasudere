@@ -112,7 +112,6 @@ public class BrowseViewModel : ViewModelBase
             if (CurrentPage > 1) { CurrentPage--; Posts.Clear(); await LoadPage(); }
         });
         LoadNextPageCommand = ReactiveCommand.CreateFromTask(LoadNextPage);
-        });
         ToggleFavoriteCommand = ReactiveCommand.CreateFromTask<PostThumbnailViewModel>(ToggleFavorite);
 
         // Initial load
