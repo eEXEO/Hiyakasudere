@@ -1,95 +1,26 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <!-- <TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks> -->
-        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net8.0-windows10.0.19041.0</TargetFrameworks>
-        <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-        <!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
-        <OutputType>Exe</OutputType>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
         <RootNamespace>Hiyakasudere</RootNamespace>
-        <UseMaui>true</UseMaui>
-        <SingleProject>true</SingleProject>
+        <Nullable>disable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <EnableDefaultCssItems>false</EnableDefaultCssItems>
-        <GenerateTemporaryStoreCertificate>true</GenerateTemporaryStoreCertificate>
-
-        <!-- Display name -->
-        <ApplicationTitle>Hiyakasudere</ApplicationTitle>
-
-        <!-- App Identifier -->
-        <ApplicationId>com.companyname.hiyakasudere</ApplicationId>
-        <ApplicationIdGuid>FAB9DB8D-1EB1-4B92-945B-E729610D9CFF</ApplicationIdGuid>
-
-        <!-- Versions -->
-        <ApplicationDisplayVersion>1.1.1</ApplicationDisplayVersion>
-        <ApplicationVersion>1</ApplicationVersion>
-		
-	  <!-- 
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
-	  -->
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</TargetPlatformMinVersion>
-        <DefaultLanguage>en</DefaultLanguage>
-        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-        <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-        <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-        <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
-        <GenerateTestArtifacts>True</GenerateTestArtifacts>
-        <AppInstallerUri>https://moeit.eu/</AppInstallerUri>
-        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\icon.png" />
-        <Resource Include="wwwroot\images\llogo.png" />
-
-        <!-- Splash Screen -->
-        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
-
-        <!-- Images -->
-        <MauiImage Include="Resources\Images\*" />
-        <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
-
-        <!-- Custom Fonts -->
-        <MauiFont Include="Resources\Fonts\*" />
-
-        <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Pages\Posts.razor.css" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="Pages\Posts.razor.css" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Blazored.Modal" Version="7.1.0" />
-      <PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
-      <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
-      <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.100" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.11" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    </ItemGroup>
-
-    <!-- Exclude non-Windows platform files from compilation since only Windows is targeted -->
-    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
-      <Compile Remove="Platforms\Android\**" />
-      <Compile Remove="Platforms\iOS\**" />
-      <Compile Remove="Platforms\MacCatalyst\**" />
-      <Compile Remove="Platforms\Tizen\**" />
-      <None Include="Platforms\Android\**" />
-      <None Include="Platforms\iOS\**" />
-      <None Include="Platforms\MacCatalyst\**" />
-      <None Include="Platforms\Tizen\**" />
+        <PackageReference Include="Avalonia" Version="11.2.6" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.6" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.6" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.6" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.6" />
+        <PackageReference Include="Avalonia.Svg.Skia" Version="11.2.6" />
+        <PackageReference Include="AsyncImageLoader.Avalonia" Version="3.3.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
 </Project>
