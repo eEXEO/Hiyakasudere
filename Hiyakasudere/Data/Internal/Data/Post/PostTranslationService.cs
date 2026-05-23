@@ -4,7 +4,6 @@ using Hiyakasudere.Data.ExternalAPI.Yandere;
 using Hiyakasudere.Data.ExternalAPI.Safebooru;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using Microsoft.Maui.Controls;
 using System.Globalization;
 using Hiyakasudere.Data.ExternalAPI.Konachan;
 using Hiyakasudere.Data.ExternalAPI.Gelbooru;
