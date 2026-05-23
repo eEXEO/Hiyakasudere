@@ -26,7 +26,7 @@ namespace Hiyakasudere.Data.Internal.Data.Post
             OriginalHeight = originalHeight;
             OriginalFileSize = originalFileSize;
             SampleHeight = sampleHeight;
-            SampleWidth = sampleHeight;
+            SampleWidth = sampleWidth;
             Rating = rating;
             HasChildren = hasChildren;
         }

@@ -1,6 +1,7 @@
 ﻿using Hiyakasudere.Data.ExternalAPI.Konachan;
 using Hiyakasudere.Data.ExternalAPI.Safebooru;
 using Hiyakasudere.Data.Internal.Config;
+using Hiyakasudere.Data.Internal.Data.Post;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -87,6 +88,39 @@ namespace Hiyakasudere.Data.ExternalAPI.Rule34
             }
 
             return rule34PostCount;
+        }
+
+        public async Task<IEnumerable<TagInternal>> GetTagsAutocompletion(string partialTag)
+        {
+            List<TagInternal> results = new();
+
+            try
+            {
+                var req = $"https://api.rule34.xxx/index.php?page=dapi&s=tag&q=index&limit=10&name_pattern=%25{partialTag}%25";
+
+                var response = await client.GetAsync(req);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var xDoc = XDocument.Parse(content);
+
+                    foreach (var tag in xDoc.Descendants("tag"))
+                    {
+                        var name = tag.Attribute("name")?.Value ?? "";
+                        var count = long.TryParse(tag.Attribute("count")?.Value, out var c) ? c : 0;
+                        var type = long.TryParse(tag.Attribute("type")?.Value, out var t) ? t : 0;
+                        var id = long.TryParse(tag.Attribute("id")?.Value, out var i) ? i : 0;
+
+                        results.Add(new TagInternal(id, name, count, type, false));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message);
+            }
+
+            return results;
         }
 
         public async Task<IEnumerable<Rule34Post>> GetRule34Data(string request)

@@ -98,11 +98,11 @@ public class KonachanPostService : IKonachanPostService
 
         public async Task<int> GetKonachanPostCount(List<string> tags)
     {
-        int yanderePostCount = 0;
+        int konachanPostCount = 0;
 
         try
         {
-            var req = "https://yande.re/post.xml?limit=1&tags=";
+            var req = "https://konachan.com/post.xml?limit=1&tags=";
 
             if (tags.Any())
             {
@@ -118,7 +118,7 @@ public class KonachanPostService : IKonachanPostService
             {
                 var content = await response.Content.ReadAsStringAsync();
                 xDocument = XDocument.Parse(content);
-                yanderePostCount = int.Parse(xDocument.Root.Attribute("count").Value);
+                konachanPostCount = int.Parse(xDocument.Root.Attribute("count").Value);
             }
 
         }
@@ -128,7 +128,7 @@ public class KonachanPostService : IKonachanPostService
             throw;
         }
 
-        return yanderePostCount;
+        return konachanPostCount;
     }
 
 }

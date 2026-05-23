@@ -33,7 +33,17 @@
 <hr>
 
 <div class="row">
-    @if (booruPosts == null)
+    @if (errorMessage != null)
+    {
+        <div class="d-flex justify-content-center flex-nowrap">
+            <div class="alert alert-warning text-center" role="alert" style="max-width: 600px; margin-top: 20px;">
+                <strong>Oops!</strong> @errorMessage
+                <br/>
+                <button class="btn btn-sm btn-outline-danger mt-2" @onclick="DisplayPage">Retry</button>
+            </div>
+        </div>
+    }
+    else if (booruPosts == null)
     {
         
         <div class="d-flex justify-content-center flex-nowrap">
@@ -105,6 +115,8 @@
     private int availablePages = 1;
     private string currentTags = "";
     private int pictureId = 0;
+    private string errorMessage = null;
+    private bool isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -115,14 +127,43 @@
     protected async Task UpdateTags()
     {
         PostService.UpdateTags(SelectedTagsList.ToList());
+        currentPage = 1;
         await DisplayPage();
     }
 
     protected async Task DisplayPage()
     {
-        SelectedTagsList = PostService.GetTags();
-        availablePages = await PostService.GetPageCount();
-        booruPosts = await PostService.GetPostData(currentPage);
+        errorMessage = null;
+        isLoading = true;
+        booruPosts = null;
+        StateHasChanged();
+
+        try
+        {
+            SelectedTagsList = PostService.GetTags();
+            availablePages = await PostService.GetPageCount();
+            booruPosts = await PostService.GetPostData(currentPage);
+
+            if (booruPosts == null || !booruPosts.Any())
+            {
+                errorMessage = "No posts found. Try different tags or check your connection.";
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = $"Network error: Could not reach the image source. Please check your internet connection.";
+            System.Diagnostics.Debug.WriteLine(ex);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while loading posts. Please try again.";
+            System.Diagnostics.Debug.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
     protected async Task NextPage()

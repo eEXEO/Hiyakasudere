@@ -9,7 +9,7 @@
 @inject IImageNetUtils ImgNetUtils
 @inject IFileManager FileManager
 
-@if (imgData == null)
+@if (isLoading)
 {
 
     <div class="d-flex justify-content-center flex-nowrap" style="padding: 5px">
@@ -19,10 +19,19 @@
     </div>
 
 }
+else if (loadError != null)
+{
+    <div class="d-flex justify-content-center flex-nowrap" style="padding: 15px">
+        <div class="alert alert-warning text-center">
+            <p>@loadError</p>
+            <input class="btn btn-danger" style="margin:5px" value="Close" @onclick="Close">
+        </div>
+    </div>
+}
 else
 {
     <div style="max-height: calc(@maxHeight); max-width: @maxWidth;">
-        <img src="@imgData" class="rounded img-fluid mx-auto d-block" style="height: @maxHeight; object-fit: contain;" id="fullImageImg">
+        <img src="@imgSrc" class="rounded img-fluid mx-auto d-block" style="height: @maxHeight; object-fit: contain;" id="fullImageImg">
 
         <div class="d-flex justify-content-center flex-nowrap" style="padding: 5px">
             <input class="btn btn-danger" style="margin:5px" value="Save Image" @onclick="SaveImage">
@@ -35,9 +44,12 @@ else
 @code {
     private PostInternal booruPost = null;
     private IJSObjectReference module;
-    private string imgData = null;
+    private string imgSrc = null;
     private string maxHeight = "100px"; 
     private string maxWidth = "100px";
+    private bool isLoading = true;
+    private string loadError = null;
+    private bool isSaving = false;
 
 
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
@@ -49,18 +61,54 @@ else
         maxHeight = Convert.ToInt32(Application.Current.MainPage.Height * 0.8).ToString() + "px";
         maxWidth = Convert.ToInt32(Application.Current.MainPage.Width * 0.8).ToString() + "px";
         booruPost = PostData;
-        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/Modals/ModalPostFull.razor.js");
 
-        var baseImg = await ImgNetUtils.GetImageAsBase64(booruPost.SampleUrl.AbsoluteUri.ToString());
-        imgData = "data:image/png;base64," + baseImg;
+        try
+        {
+            // Use the sample URL directly instead of downloading and converting to base64
+            // This saves significant memory (no double-allocation of image data)
+            if (booruPost.SampleUrl != null)
+            {
+                imgSrc = booruPost.SampleUrl.AbsoluteUri.ToString();
+            }
+            else if (booruPost.PreviewUrl != null)
+            {
+                imgSrc = booruPost.PreviewUrl.AbsoluteUri.ToString();
+            }
+            else
+            {
+                loadError = "No image URL available for this post.";
+            }
+        }
+        catch (Exception ex)
+        {
+            loadError = "Failed to load image. Please try again.";
+            System.Diagnostics.Debug.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     protected async Task SaveImage()
     {
-        var imgData = await ImgNetUtils.GetImageAsBase64(booruPost.OriginalUrl.AbsoluteUri.ToString());
+        if (isSaving) return;
+        isSaving = true;
 
-        await FileManager.SaveImage(imgData, "Hiyakasudere" + "_" + DateTime.Now.ToFileTime());
-
+        try
+        {
+            // Only download as base64 when saving (we need the actual bytes for file write)
+            var imgData = await ImgNetUtils.GetImageAsBase64(booruPost.OriginalUrl.AbsoluteUri.ToString());
+            await FileManager.SaveImage(imgData, "Hiyakasudere" + "_" + DateTime.Now.ToFileTime());
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("Save failed: " + ex.Message);
+        }
+        finally
+        {
+            isSaving = false;
+        }
     }
     protected async Task Close()
     {

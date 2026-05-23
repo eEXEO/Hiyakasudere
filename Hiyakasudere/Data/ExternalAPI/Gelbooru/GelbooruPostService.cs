@@ -1,5 +1,6 @@
 ﻿using Hiyakasudere.Data.ExternalAPI.Gelbooru;
 using Hiyakasudere.Data.Internal.Config;
+using Hiyakasudere.Data.Internal.Data.Post;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +55,7 @@ namespace Hiyakasudere.Data.ExternalAPI.Gelbooru
 
         public async Task<int> GetGelbooruPostCount(List<string> tags)
         {
-            int safebooruPostCount = 0;
+            int gelbooruPostCount = 0;
 
             var req = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=0&tags=";
 
@@ -73,7 +74,7 @@ namespace Hiyakasudere.Data.ExternalAPI.Gelbooru
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     xDocument = XDocument.Parse(content);
-                    safebooruPostCount = int.Parse(xDocument.Root.Attribute("count").Value);
+                    gelbooruPostCount = int.Parse(xDocument.Root.Attribute("count").Value);
                 }
 
             }
@@ -83,7 +84,40 @@ namespace Hiyakasudere.Data.ExternalAPI.Gelbooru
                 throw;
             }
 
-            return safebooruPostCount;
+            return gelbooruPostCount;
+        }
+
+        public async Task<IEnumerable<TagInternal>> GetTagsAutocompletion(string partialTag)
+        {
+            List<TagInternal> results = new();
+
+            try
+            {
+                var req = $"https://gelbooru.com/index.php?page=dapi&s=tag&q=index&limit=10&name_pattern=%25{partialTag}%25";
+
+                var response = await client.GetAsync(req);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var xDoc = XDocument.Parse(content);
+
+                    foreach (var tag in xDoc.Descendants("tag"))
+                    {
+                        var name = tag.Attribute("name")?.Value ?? "";
+                        var count = long.TryParse(tag.Attribute("count")?.Value, out var c) ? c : 0;
+                        var type = long.TryParse(tag.Attribute("type")?.Value, out var t) ? t : 0;
+                        var id = long.TryParse(tag.Attribute("id")?.Value, out var i) ? i : 0;
+
+                        results.Add(new TagInternal(id, name, count, type, false));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message);
+            }
+
+            return results;
         }
 
         public async Task<IEnumerable<GelbooruPost>> GetGelbooruData(string request)

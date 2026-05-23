@@ -57,6 +57,55 @@ namespace Hiyakasudere.Data.Internal.Data.Post
             return temp;
         }
 
+        /// <summary>
+        /// Robustly parses date strings from various booru APIs.
+        /// Handles formats like "Mon Jan 01 12:00:00 +0000 2024" with or without colon in timezone offset.
+        /// </summary>
+        protected DateTime TryParseBooruDate(string dateString)
+        {
+            if (string.IsNullOrEmpty(dateString))
+                return DateTime.MinValue;
+
+            // Try standard DateTimeOffset parsing first (handles most ISO formats)
+            if (DateTimeOffset.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dto))
+                return dto.UtcDateTime;
+
+            // Try the booru format "ddd MMM dd H:mm:ss zzz yyyy" - needs colon in timezone
+            string normalized = dateString;
+            try
+            {
+                // Find timezone offset pattern like +0000 or -0500 (without colon) and insert colon
+                // Regex-free approach: find + or - followed by 4 digits near end of string
+                int plusIdx = normalized.LastIndexOf('+');
+                int minusIdx = normalized.LastIndexOf('-');
+                int tzIdx = Math.Max(plusIdx, minusIdx);
+
+                if (tzIdx > 0 && tzIdx < normalized.Length - 4)
+                {
+                    // Check if it's a 4-digit offset without colon (e.g., +0000)
+                    string afterSign = normalized.Substring(tzIdx + 1, 4);
+                    if (afterSign.All(char.IsDigit) && (tzIdx + 5 >= normalized.Length || normalized[tzIdx + 5] == ' '))
+                    {
+                        // Insert colon: +0000 -> +00:00
+                        if (!normalized.Substring(tzIdx, 6).Contains(':'))
+                        {
+                            normalized = normalized.Insert(tzIdx + 3, ":");
+                        }
+                    }
+                }
+
+                return DateTime.ParseExact(normalized, "ddd MMM dd H:mm:ss zzz yyyy", CultureInfo.GetCultureInfo("en-US"));
+            }
+            catch
+            {
+                // Last resort: try general DateTime.TryParse
+                if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var fallback))
+                    return fallback;
+            }
+
+            return DateTime.MinValue;
+        }
+
         public async Task<int> GetPageCount()
         {
             var count = 1;
@@ -208,9 +257,8 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                                 element.Rating = "Safe";
                             }
 
-                            //Parse date
-                            element.Created_at = element.Created_at.Insert(element.Created_at.IndexOf("+") + 3, ":");
-                            loDate = DateTime.ParseExact(element.Created_at, "ddd MMM dd H:mm:ss zzz yyyy", CultureInfo.GetCultureInfo("en-US"));
+                            //Parse date - use robust parsing
+                            loDate = TryParseBooruDate(element.Created_at);
 
                         }
                         catch(Exception e)
@@ -295,17 +343,11 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                                 element.Rating = "Safe";
                             }
 
-                            //Parse date
-                            if(element.CreatedAt.IndexOf("+") != -1)
+                            //Parse date - use robust parsing
+                            if(element.CreatedAt != null)
                             {
-                                element.CreatedAt = element.CreatedAt.Insert(element.CreatedAt.IndexOf("+") + 3, ":");
+                                loDate = TryParseBooruDate(element.CreatedAt);
                             }
-                            else
-                            {
-                                element.CreatedAt = element.CreatedAt.Insert(element.CreatedAt.IndexOf("-") + 3, ":");
-                            }
-
-                            loDate = DateTime.ParseExact(element.CreatedAt, "ddd MMM dd H:mm:ss zzz yyyy", CultureInfo.GetCultureInfo("en-US"));
 
 
                             Uri.TryCreate(element.SampleUrl, UriKind.RelativeOrAbsolute, out sample);
@@ -373,9 +415,11 @@ namespace Hiyakasudere.Data.Internal.Data.Post
                                 element.Rating = "Safe";
                             }
 
-                            //Parse date
-                            element.CreatedAt = element.CreatedAt.Insert(element.CreatedAt.IndexOf("+") + 3, ":");
-                            loDate = DateTime.ParseExact(element.CreatedAt, "ddd MMM dd H:mm:ss zzz yyyy", CultureInfo.GetCultureInfo("en-US"));
+                            //Parse date - use robust parsing
+                            if(element.CreatedAt != null)
+                            {
+                                loDate = TryParseBooruDate(element.CreatedAt);
+                            }
 
                         }
                         catch (Exception e)
@@ -405,13 +449,68 @@ namespace Hiyakasudere.Data.Internal.Data.Post
         {
             List<TagInternal> tagInternal = new();
 
-            var yandereTags = await _yanderePostService.GetTagsAutocompletion(partialTag);
-
+            // Always add the raw typed text as first option
             tagInternal.Add(new TagInternal(0, partialTag, 1, 1, false));
-            foreach (YandereTag tag in yandereTags)
+
+            try
             {
-                tagInternal.Add(new TagInternal(tag.Id, tag.Name, tag.Count, tag.Type, tag.Ambiguous));
+                switch (_appConfigService.SelectedSource)
+                {
+                    case 1: // Yandere
+                        var yandereTags = await _yanderePostService.GetTagsAutocompletion(partialTag);
+                        foreach (YandereTag tag in yandereTags)
+                        {
+                            tagInternal.Add(new TagInternal(tag.Id, tag.Name, tag.Count, tag.Type, tag.Ambiguous));
+                        }
+                        break;
+
+                    case 2: // Safebooru
+                        var safebooruTags = await _safebooruPostService.GetTagsAutocompletion(partialTag);
+                        foreach (TagInternal tag in safebooruTags)
+                        {
+                            tagInternal.Add(tag);
+                        }
+                        break;
+
+                    case 3: // Konachan
+                        var konachanTags = await _konachanPostService.GetTagsAutocompletion(partialTag);
+                        foreach (KonachanTag tag in konachanTags)
+                        {
+                            tagInternal.Add(new TagInternal(tag.Id, tag.Name, tag.Count, tag.Type, tag.Ambiguous));
+                        }
+                        break;
+
+                    case 4: // Gelbooru
+                        var gelbooruTags = await _gelbooruPostService.GetTagsAutocompletion(partialTag);
+                        foreach (TagInternal tag in gelbooruTags)
+                        {
+                            tagInternal.Add(tag);
+                        }
+                        break;
+
+                    case 5: // Rule34
+                        var rule34Tags = await _rule34PostService.GetTagsAutocompletion(partialTag);
+                        foreach (TagInternal tag in rule34Tags)
+                        {
+                            tagInternal.Add(tag);
+                        }
+                        break;
+
+                    default:
+                        // Fallback to Yandere
+                        var fallbackTags = await _yanderePostService.GetTagsAutocompletion(partialTag);
+                        foreach (YandereTag tag in fallbackTags)
+                        {
+                            tagInternal.Add(new TagInternal(tag.Id, tag.Name, tag.Count, tag.Type, tag.Ambiguous));
+                        }
+                        break;
+                }
             }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("Tag autocomplete error: " + e.Message);
+            }
+
             return tagInternal.AsEnumerable(); 
         }
     }
