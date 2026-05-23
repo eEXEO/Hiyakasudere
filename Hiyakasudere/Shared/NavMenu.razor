@@ -1,4 +1,6 @@
-﻿<div class="d-flex flex-column flex-shrink-0 sidebar">
+@using Hiyakasudere.Data.Internal.Database
+
+<div class="d-flex flex-column flex-shrink-0 sidebar">
 	<a @onclick="ToggleNavMenu" class="d-block p-3 link-dark text-decoration-none col-auto text-center">
 		<img src="images/llogo.png" width="40" />
 	</a>
@@ -7,6 +9,11 @@
 			<li>
 				<a href="posts" class="nav-link py-3 border-bottom rounded-0">
 				   <span class="oi oi-grid-three-up text-white" aria-hidden="true"></span>
+				</a>
+			</li>
+			<li>
+				<a href="favorites" class="nav-link py-3 border-bottom rounded-0">
+				   <span class="oi oi-heart text-white" aria-hidden="true"></span>
 				</a>
 			</li>
 			<li>

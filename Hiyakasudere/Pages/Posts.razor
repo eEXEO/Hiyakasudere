@@ -1,12 +1,16 @@
-﻿@page "/posts"
+@page "/posts"
 @using Hiyakasudere.Data.Internal.Data.Post
 @using Hiyakasudere.Data.Internal.Config
 @using Hiyakasudere.Data.Internal.MultiplatformInterfaces
+@using Hiyakasudere.Data.Internal.Database
 @using Hiyakasudere.Pages.Modals
 @using Blazored.Typeahead
 
 @inject IPostTranslationService PostService
 @inject IFileManager FileManager
+@inject IFavoritesService FavoritesService
+@inject ISearchHistoryService SearchHistoryService
+@inject IAppConfigService AppConfig
 
 <form class="row justify-content-center g-3">
     <div class="col-md-10">
@@ -29,6 +33,19 @@
         </div>
     </div>
 </form>
+
+@if (recentSearches != null && recentSearches.Any())
+{
+    <div class="d-flex flex-wrap gap-1 mt-2 justify-content-center">
+        <small class="text-muted align-self-center me-1">Recent:</small>
+        @foreach (var search in recentSearches.Take(8))
+        {
+            <button class="btn btn-outline-secondary btn-sm" style="font-size: 0.7rem;" @onclick="() => ApplyHistorySearch(search)">
+                @search.Tags
+            </button>
+        }
+    </div>
+}
 
 <hr>
 
@@ -57,8 +74,8 @@
     else
     {
 
-        int columnCount = 5;
-        int chunkSize = (int)Math.Ceiling((double)booruPosts.Count() / columnCount);
+        int columnCount = GetResponsiveColumnCount();
+        int chunkSize = Math.Max(1, (int)Math.Ceiling((double)booruPosts.Count() / columnCount));
         var chunks = booruPosts
         .Select((value, index) => new { Index = index, Value = value })
         .GroupBy(x => x.Index / chunkSize)
@@ -72,7 +89,13 @@
                     @foreach (var post in chunk)
                     {
                         post.tempId = pictureId;
-                        <img src="@post.PreviewUrl" style="width: 100%" @onclick="() => ShowModal(post.tempId)">
+                        <div style="position: relative; display: inline-block; width: 100%;">
+                            <img src="@post.PreviewUrl" style="width: 100%; cursor: pointer;" @onclick="() => ShowModal(post.tempId)">
+                            <span class="@GetHeartClass(post)" style="position: absolute; top: 4px; right: 4px; cursor: pointer; font-size: 1.2rem;"
+                                  @onclick="() => ToggleFavorite(post)">
+                                @(IsPostFavorited(post) ? "\u2764" : "\u2661")
+                            </span>
+                        </div>
                         pictureId++;
                     }
                 </div>
@@ -86,24 +109,17 @@
 <div class="fixed-bottom d-flex justify-content-center" style="z-index: 10;">
     <nav>
         <ul class="pagination">
-            <li class="page-item"><a class="page-link" @onclick="PrevPage">Previous</a></li>
-            <li class="page-item" style="pointer-events: none;"><a class="page-link" style="font-weight: bold;">@currentPage</a></li>
-            <li class="page-item"><a class="page-link" @onclick="NextPage">Next</a></li>
+            <li class="page-item @(currentPage <= 1 ? "disabled" : "")"><a class="page-link" @onclick="PrevPage">Prev</a></li>
+            <li class="page-item" style="pointer-events: none;"><a class="page-link" style="font-weight: bold;">@currentPage / @availablePages</a></li>
+            <li class="page-item">
+                <input type="number" class="form-control form-control-sm" style="width: 60px; display: inline-block;" min="1" max="@availablePages"
+                       @bind="jumpToPage" @bind:event="oninput" />
+            </li>
+            <li class="page-item"><a class="page-link" @onclick="GoToPage">Go</a></li>
+            <li class="page-item @(currentPage >= availablePages ? "disabled" : "")"><a class="page-link" @onclick="NextPage">Next</a></li>
         </ul>
     </nav>
 </div>
-
-@*<div class="d-flex justify-content-center flex-nowrap">
-    <div class="text-white mx-2 p-2">
-        <nav>
-            <ul class="pagination">
-                <li class="page-item"><a class="page-link" @onclick="PrevPage">Previous</a></li>
-                <li class="page-item" style="pointer-events: none;"><a class="page-link" style="font-weight: bold;">@currentPage</a></li>
-                <li class="page-item"><a class="page-link" @onclick="NextPage">Next</a></li>
-            </ul>
-        </nav>
-    </div>
- </div>*@
 
 
 @code {
@@ -113,19 +129,42 @@
 
     private int currentPage = 1;
     private int availablePages = 1;
+    private int jumpToPage = 1;
     private string currentTags = "";
     private int pictureId = 0;
     private string errorMessage = null;
     private bool isLoading = false;
+    private List<SearchHistoryEntry> recentSearches;
+    private HashSet<string> favoritedPostKeys = new();
 
     protected override async Task OnInitializedAsync()
     {
         SelectedTagsList = new List<TagInternal>();
+        recentSearches = await SearchHistoryService.GetRecentSearches(8);
         await DisplayPage();
     }
 
     protected async Task UpdateTags()
     {
+        PostService.UpdateTags(SelectedTagsList.ToList());
+        currentPage = 1;
+
+        // Save to search history
+        var tagString = string.Join(" ", SelectedTagsList.Select(t => t.Name).Where(n => !string.IsNullOrEmpty(n)));
+        if (!string.IsNullOrWhiteSpace(tagString))
+        {
+            await SearchHistoryService.AddSearch(tagString, AppConfig.SelectedSource);
+            recentSearches = await SearchHistoryService.GetRecentSearches(8);
+        }
+
+        await DisplayPage();
+    }
+
+    protected async Task ApplyHistorySearch(SearchHistoryEntry entry)
+    {
+        // Apply the search from history
+        var tagNames = entry.Tags.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        SelectedTagsList = tagNames.Select(t => new TagInternal(0, t, 1, 1, false)).ToList();
         PostService.UpdateTags(SelectedTagsList.ToList());
         currentPage = 1;
         await DisplayPage();
@@ -148,27 +187,39 @@
             {
                 errorMessage = "No posts found. Try different tags or check your connection.";
             }
+            else
+            {
+                // Load favorite status for current posts
+                favoritedPostKeys.Clear();
+                foreach (var post in booruPosts)
+                {
+                    if (await FavoritesService.IsFavorite(post.Id, AppConfig.SelectedSource))
+                    {
+                        favoritedPostKeys.Add($"{post.Id}_{AppConfig.SelectedSource}");
+                    }
+                }
+            }
         }
         catch (HttpRequestException ex)
         {
-            errorMessage = $"Network error: Could not reach the image source. Please check your internet connection.";
+            errorMessage = "Network error: Could not reach the image source. Please check your internet connection.";
             System.Diagnostics.Debug.WriteLine(ex);
         }
         catch (Exception ex)
         {
-            errorMessage = $"An error occurred while loading posts. Please try again.";
+            errorMessage = "An error occurred while loading posts. Please try again.";
             System.Diagnostics.Debug.WriteLine(ex);
         }
         finally
         {
             isLoading = false;
+            jumpToPage = currentPage;
             StateHasChanged();
         }
     }
 
     protected async Task NextPage()
     {
-        System.Diagnostics.Debug.WriteLine(currentPage + "__" + availablePages);
         if (currentPage + 1 <= availablePages)
         {
             currentPage++;
@@ -183,7 +234,54 @@
             currentPage--;
             await DisplayPage();
         }
+    }
 
+    protected async Task GoToPage()
+    {
+        if (jumpToPage >= 1 && jumpToPage <= availablePages && jumpToPage != currentPage)
+        {
+            currentPage = jumpToPage;
+            await DisplayPage();
+        }
+    }
+
+    private bool IsPostFavorited(PostInternal post)
+    {
+        return favoritedPostKeys.Contains($"{post.Id}_{AppConfig.SelectedSource}");
+    }
+
+    private string GetHeartClass(PostInternal post)
+    {
+        return IsPostFavorited(post) ? "text-danger" : "text-white";
+    }
+
+    private async Task ToggleFavorite(PostInternal post)
+    {
+        var key = $"{post.Id}_{AppConfig.SelectedSource}";
+        if (favoritedPostKeys.Contains(key))
+        {
+            await FavoritesService.RemoveFavorite(post.Id, AppConfig.SelectedSource);
+            favoritedPostKeys.Remove(key);
+        }
+        else
+        {
+            var fav = new FavoritePost
+            {
+                SourcePostId = post.Id,
+                SourceId = AppConfig.SelectedSource,
+                PreviewUrl = post.PreviewUrl?.AbsoluteUri ?? "",
+                SampleUrl = post.SampleUrl?.AbsoluteUri ?? "",
+                OriginalUrl = post.OriginalUrl?.AbsoluteUri ?? "",
+                Tags = post.Tags ?? "",
+                Rating = post.Rating ?? "",
+                Score = post.Score,
+                Width = post.OriginalWidth,
+                Height = post.OriginalHeight
+            };
+            await FavoritesService.AddFavorite(fav);
+            favoritedPostKeys.Add(key);
+        }
+        StateHasChanged();
     }
 
     private void ShowModal(int postId)
@@ -199,10 +297,25 @@
         var parameters = new ModalParameters().Add("PostData", booruPosts.ElementAt(postId));
 
         var modal = Modal.Show<ModalPostFull>("", parameters, options);
-        System.Diagnostics.Debug.WriteLine(currentTags);
     }
 
-    private IList<TagInternal>? SelectedTagsList;
+    private int GetResponsiveColumnCount()
+    {
+        try
+        {
+            var width = Application.Current?.MainPage?.Width ?? 1200;
+            if (width < 600) return 2;
+            if (width < 900) return 3;
+            if (width < 1200) return 4;
+            return 5;
+        }
+        catch
+        {
+            return 5;
+        }
+    }
+
+    private IList<TagInternal> SelectedTagsList;
 
     protected async Task<IEnumerable<TagInternal>> GetMatchingTags(string searchText)
     {

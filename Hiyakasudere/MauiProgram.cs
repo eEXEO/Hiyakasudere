@@ -8,6 +8,8 @@ using Hiyakasudere.Data.Internal.Functionality.ImageUtils;
 using Hiyakasudere.Data.ExternalAPI.Konachan;
 using Hiyakasudere.Data.ExternalAPI.Gelbooru;
 using Hiyakasudere.Data.ExternalAPI.Rule34;
+using Hiyakasudere.Data.Internal.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hiyakasudere;
 
@@ -33,6 +35,12 @@ public static class MauiProgram
 
         builder.Services.AddBlazoredModal();
 
+        // SQLite Database
+        var dbPath = Path.Combine(FileSystem.AppDataDirectory, "hiyakasudere.db");
+        builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite($"Data Source={dbPath}"));
+        builder.Services.AddScoped<IFavoritesService, FavoritesService>();
+        builder.Services.AddScoped<ISearchHistoryService, SearchHistoryService>();
+
         builder.Services.AddSingleton<IYanderePostService, YanderePostService>();
         builder.Services.AddSingleton<ISafebooruPostService, SafebooruPostService>();
 		builder.Services.AddSingleton<IPostTranslationService, PostTranslationService>();
@@ -41,10 +49,16 @@ public static class MauiProgram
         builder.Services.AddSingleton<IRule34PostService, Rule34PostService>();
         builder.Services.AddSingleton<IAppConfigService, AppConfigService>();
         builder.Services.AddSingleton<IImageNetUtils, ImageNetUtils>();
-        
 
+        var app = builder.Build();
 
+        // Ensure database is created
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.EnsureCreated();
+        }
 
-        return builder.Build();
+        return app;
 	}
 }
