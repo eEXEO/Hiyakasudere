@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Hiyakasudere.ViewModels"
+             xmlns:db="using:Hiyakasudere.Data.Internal.Database"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             x:Class="Hiyakasudere.Views.FavoritesView"
+             x:DataType="vm:FavoritesViewModel">
+
+    <DockPanel>
+        <!-- Header -->
+        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+            <TextBlock Classes="page-title" DockPanel.Dock="Left">
+                <Run Text="Favorites" />
+                <Run Text=" (" /><Run Text="{Binding Count}" /><Run Text=")" />
+            </TextBlock>
+            <Button Classes="btn-secondary" DockPanel.Dock="Right" Content="Refresh"
+                    Command="{Binding RefreshCommand}" />
+        </DockPanel>
+
+        <!-- Empty state -->
+        <StackPanel IsVisible="{Binding !Favorites.Count}" VerticalAlignment="Center"
+                    HorizontalAlignment="Center" Spacing="8">
+            <TextBlock Text="\u2661" FontSize="48" HorizontalAlignment="Center" Foreground="#533483" />
+            <TextBlock Text="No favorites yet" FontSize="16" Foreground="#8892b0" HorizontalAlignment="Center" />
+            <TextBlock Text="Browse posts and click the heart icon to save them here"
+                       FontSize="12" Foreground="#53548a" HorizontalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Favorites Grid -->
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Favorites}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="db:FavoritePost">
+                        <Border Classes="image-card" Width="200" Height="200">
+                            <Grid>
+                                <Image asyncImageLoader:ImageLoader.Source="{Binding PreviewUrl}"
+                                       Stretch="UniformToFill" />
+                                <!-- Remove button -->
+                                <Button Classes="heart-btn" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4"
+                                        Command="{Binding $parent[ItemsControl].((vm:FavoritesViewModel)DataContext).RemoveFavoriteCommand}"
+                                        CommandParameter="{Binding}">
+                                    <TextBlock Text="X" FontSize="14" FontWeight="Bold" Foreground="#e94560" />
+                                </Button>
+                                <!-- Score badge -->
+                                <Border Background="#80000000" CornerRadius="4" Padding="4,2"
+                                        HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
+                                    <TextBlock FontSize="10" Foreground="#ffffff">
+                                        <Run Text="Score: " /><Run Text="{Binding Score}" />
+                                    </TextBlock>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+
+</UserControl>

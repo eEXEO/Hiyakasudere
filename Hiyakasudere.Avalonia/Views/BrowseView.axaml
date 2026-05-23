@@ -1,0 +1,93 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Hiyakasudere.ViewModels"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             x:Class="Hiyakasudere.Views.BrowseView"
+             x:DataType="vm:BrowseViewModel">
+
+    <DockPanel>
+        <!-- Search Bar -->
+        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+            <Button Classes="btn-primary" DockPanel.Dock="Right" Margin="8,0,0,0"
+                    Command="{Binding SearchCommand}" Content="Search" />
+            <TextBox Classes="search-box" Text="{Binding SearchText}"
+                     Watermark="Enter tags separated by spaces..." />
+        </DockPanel>
+
+        <!-- Recent Searches -->
+        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding RecentSearches}" Margin="0,0,0,12"
+                      IsVisible="{Binding RecentSearches.Count}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Classes="tag-chip">
+                        <TextBlock Text="{Binding}" FontSize="11" Foreground="#8892b0" />
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Pagination -->
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
+                <Button Classes="page-btn" Command="{Binding PrevPageCommand}" Content="&lt;" />
+                <TextBlock VerticalAlignment="Center" Foreground="#ffffff" Margin="8,0">
+                    <Run Text="{Binding CurrentPage}" />
+                    <Run Text=" / " />
+                    <Run Text="{Binding TotalPages}" />
+                </TextBlock>
+                <Button Classes="page-btn" Command="{Binding NextPageCommand}" Content="&gt;" />
+            </StackPanel>
+            <TextBlock Text="{Binding StatusText}" Foreground="#8892b0" FontSize="12"
+                       VerticalAlignment="Center" HorizontalAlignment="Right" />
+        </DockPanel>
+
+        <!-- Loading -->
+        <ProgressBar DockPanel.Dock="Top" IsIndeterminate="True" IsVisible="{Binding IsLoading}"
+                     Foreground="#e94560" Height="3" Margin="0,0,0,8" />
+
+        <!-- Error -->
+        <Border DockPanel.Dock="Top" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Background="#2d1b1b" CornerRadius="8" Padding="16" Margin="0,0,0,8">
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="#e94560" TextWrapping="Wrap" />
+        </Border>
+
+        <!-- Image Grid -->
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Posts}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:PostThumbnailViewModel">
+                        <Border Classes="image-card" Width="200" Height="200">
+                            <Grid>
+                                <Image asyncImageLoader:ImageLoader.Source="{Binding PreviewUrl}"
+                                       Stretch="UniformToFill" />
+                                <!-- Heart overlay -->
+                                <Button Classes="heart-btn" Classes.favorited="{Binding IsFavorited}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4"
+                                        Command="{Binding $parent[ItemsControl].((vm:BrowseViewModel)DataContext).ToggleFavoriteCommand}"
+                                        CommandParameter="{Binding}">
+                                    <TextBlock Text="{Binding HeartIcon}" FontSize="18" />
+                                </Button>
+                                <!-- Rating badge -->
+                                <Border Background="#80000000" CornerRadius="4" Padding="4,2"
+                                        HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
+                                    <TextBlock Text="{Binding Rating}" FontSize="10" Foreground="#ffffff" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+
+</UserControl>

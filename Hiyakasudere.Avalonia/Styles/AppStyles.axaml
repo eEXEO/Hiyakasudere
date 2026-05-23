@@ -1,0 +1,156 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Modern Dark Theme Customization -->
+    <Style Selector="Window">
+        <Setter Property="Background" Value="#1a1a2e" />
+    </Style>
+
+    <!-- Sidebar styling -->
+    <Style Selector="Border.sidebar">
+        <Setter Property="Background" Value="#16213e" />
+        <Setter Property="Width" Value="60" />
+    </Style>
+
+    <Style Selector="Button.nav-btn">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="#8892b0" />
+        <Setter Property="Width" Value="60" />
+        <Setter Property="Height" Value="50" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="Button.nav-btn:pointerover">
+        <Setter Property="Background" Value="#1a1a2e" />
+        <Setter Property="Foreground" Value="#e94560" />
+    </Style>
+
+    <Style Selector="Button.nav-btn.active">
+        <Setter Property="Background" Value="#1a1a2e" />
+        <Setter Property="Foreground" Value="#e94560" />
+        <Setter Property="BorderBrush" Value="#e94560" />
+        <Setter Property="BorderThickness" Value="3,0,0,0" />
+    </Style>
+
+    <!-- Content area -->
+    <Style Selector="Border.content-area">
+        <Setter Property="Background" Value="#1a1a2e" />
+        <Setter Property="Padding" Value="20" />
+    </Style>
+
+    <!-- Search bar -->
+    <Style Selector="TextBox.search-box">
+        <Setter Property="Background" Value="#0f3460" />
+        <Setter Property="Foreground" Value="#ffffff" />
+        <Setter Property="BorderBrush" Value="#533483" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <Style Selector="TextBox.search-box:focus">
+        <Setter Property="BorderBrush" Value="#e94560" />
+    </Style>
+
+    <!-- Action buttons -->
+    <Style Selector="Button.btn-primary">
+        <Setter Property="Background" Value="#e94560" />
+        <Setter Property="Foreground" Value="#ffffff" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="Button.btn-primary:pointerover">
+        <Setter Property="Background" Value="#d63851" />
+    </Style>
+
+    <Style Selector="Button.btn-secondary">
+        <Setter Property="Background" Value="#0f3460" />
+        <Setter Property="Foreground" Value="#ffffff" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="#533483" />
+    </Style>
+
+    <Style Selector="Button.btn-secondary:pointerover">
+        <Setter Property="Background" Value="#533483" />
+    </Style>
+
+    <!-- Image card -->
+    <Style Selector="Border.image-card">
+        <Setter Property="Background" Value="#16213e" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Margin" Value="4" />
+    </Style>
+
+    <Style Selector="Border.image-card:pointerover">
+        <Setter Property="BoxShadow" Value="0 4 12 0 #40e94560" />
+    </Style>
+
+    <!-- Page titles -->
+    <Style Selector="TextBlock.page-title">
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="#ffffff" />
+        <Setter Property="Margin" Value="0,0,0,16" />
+    </Style>
+
+    <Style Selector="TextBlock.subtitle">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="#8892b0" />
+    </Style>
+
+    <!-- Tags chip -->
+    <Style Selector="Border.tag-chip">
+        <Setter Property="Background" Value="#0f3460" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+
+    <!-- Pagination -->
+    <Style Selector="Button.page-btn">
+        <Setter Property="Background" Value="#16213e" />
+        <Setter Property="Foreground" Value="#ffffff" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="MinWidth" Value="36" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Margin" Value="2,0" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="#533483" />
+    </Style>
+
+    <Style Selector="Button.page-btn:pointerover">
+        <Setter Property="Background" Value="#e94560" />
+        <Setter Property="BorderBrush" Value="#e94560" />
+    </Style>
+
+    <!-- Heart/Favorite overlay -->
+    <Style Selector="Button.heart-btn">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="#ffffff" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="Opacity" Value="0.7" />
+    </Style>
+
+    <Style Selector="Button.heart-btn:pointerover">
+        <Setter Property="Foreground" Value="#e94560" />
+        <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <Style Selector="Button.heart-btn.favorited">
+        <Setter Property="Foreground" Value="#e94560" />
+        <Setter Property="Opacity" Value="1" />
+    </Style>
+
+</Styles>

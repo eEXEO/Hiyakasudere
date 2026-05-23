@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Hiyakasudere.ViewModels"
+             x:Class="Hiyakasudere.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <ScrollViewer>
+        <StackPanel MaxWidth="500" Margin="0,0,0,40" Spacing="24">
+            <TextBlock Classes="page-title" Text="Settings" />
+
+            <!-- Source Selection -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Image Source" FontWeight="SemiBold" Foreground="#ffffff" />
+                <TextBlock Classes="subtitle" Text="Select which booru site to browse" />
+                <ComboBox ItemsSource="{Binding SourceNames}" SelectedIndex="{Binding SelectedSource}"
+                          Background="#0f3460" Foreground="#ffffff" CornerRadius="8" />
+            </StackPanel>
+
+            <!-- Posts Per Page -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Posts Per Page" FontWeight="SemiBold" Foreground="#ffffff" />
+                <TextBlock Classes="subtitle" Text="Number of images to load per page" />
+                <ComboBox ItemsSource="{Binding PostsPerPageOptions}" SelectedItem="{Binding PostsPerPage}"
+                          Background="#0f3460" Foreground="#ffffff" CornerRadius="8" />
+            </StackPanel>
+
+            <!-- NSFW Toggle -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Content Filter" FontWeight="SemiBold" Foreground="#ffffff" />
+                <TextBlock Classes="subtitle" Text="Show explicit and questionable content" />
+                <ToggleSwitch IsChecked="{Binding NsfwEnabled}" OnContent="NSFW Enabled" OffContent="Safe Only" />
+            </StackPanel>
+
+            <!-- Save Button -->
+            <Button Classes="btn-primary" Content="Save Settings" Command="{Binding SaveCommand}"
+                    HorizontalAlignment="Left" Margin="0,8,0,0" />
+
+            <!-- Status -->
+            <TextBlock Text="{Binding StatusMessage}" Foreground="#4caf50" FontSize="13"
+                       IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+            <!-- About -->
+            <Border Background="#16213e" CornerRadius="8" Padding="16" Margin="0,16,0,0">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Hiyakasudere" FontWeight="Bold" Foreground="#ffffff" FontSize="16" />
+                    <TextBlock Text="v2.0.0 - Avalonia Edition" Foreground="#8892b0" FontSize="12" />
+                    <TextBlock Text="Cross-platform booru image browser" Foreground="#53548a" FontSize="12" />
+                    <TextBlock Text="Windows - Linux - macOS" Foreground="#533483" FontSize="11" Margin="0,4,0,0" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>
