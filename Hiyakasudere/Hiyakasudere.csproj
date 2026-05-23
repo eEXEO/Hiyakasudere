@@ -35,7 +35,6 @@
         <DefaultLanguage>en</DefaultLanguage>
         <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
         <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-        <PackageCertificateThumbprint>E2463F5664818A489175F8CC624D2B1E4444EDC5</PackageCertificateThumbprint>
         <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
         <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
         <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
@@ -74,6 +73,8 @@
     <ItemGroup>
       <PackageReference Include="Blazored.Modal" Version="7.1.0" />
       <PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
+      <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
+      <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.100" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.11" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>

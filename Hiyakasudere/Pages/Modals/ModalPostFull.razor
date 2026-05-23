@@ -1,11 +1,9 @@
 ﻿@page "/modals/postfull"
-@using Microsoft.JSInterop
 @using Microsoft.Maui
 @using Hiyakasudere.Data.Internal.Data.Post
 @using Hiyakasudere.Data.Internal.MultiplatformInterfaces
 @using Hiyakasudere.Data.Internal.Functionality.ImageUtils
 
-@inject IJSRuntime JS
 @inject IImageNetUtils ImgNetUtils
 @inject IFileManager FileManager
 
@@ -43,7 +41,6 @@ else
 
 @code {
     private PostInternal booruPost = null;
-    private IJSObjectReference module;
     private string imgSrc = null;
     private string maxHeight = "100px"; 
     private string maxWidth = "100px";
@@ -56,7 +53,7 @@ else
     [CascadingParameter] IModalService Modal { get; set; } = default!;
     [Parameter] public PostInternal PostData { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         maxHeight = Convert.ToInt32(Application.Current.MainPage.Height * 0.8).ToString() + "px";
         maxWidth = Convert.ToInt32(Application.Current.MainPage.Width * 0.8).ToString() + "px";
